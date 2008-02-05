@@ -1,0 +1,83 @@
+<html><head><title>Extract a data frame from a CAIC object.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="Rchm.css">
+</head>
+<body>
+
+<table width="100%"><tr><td>caic.table(CAIC)</td><td align="right">R Documentation</td></tr></table><object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+<param name="keyword" value="R:   caic.table">
+<param name="keyword" value=" Extract a data frame from a CAIC object.">
+</object>
+
+
+<h2>Extract a data frame from a CAIC object.</h2>
+
+
+<h3>Description</h3>
+
+<p>
+A CAIC object contains a relatively complex list (obj$contrast.data) containing contrasts and other values. This function extracts this data to a data frame, optionally including information on all nodes in the phylogeny, not just those for which valid contrasts can be calculated. There is also an option to include nodal values for the internal nodes in the data frame.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+caic.table(caicObj, validNodes = TRUE, nodalValues=FALSE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>caicObj</code></td>
+<td>
+A CAIC object produced by either <code>caic()</code> or <code>macrocaic()</code>.</td></tr>
+<tr valign="top"><td><code>validNodes</code></td>
+<td>
+</td></tr>
+<tr valign="top"><td><code>nodalValues</code></td>
+<td>
+~~Describe <code>validNodes</code> here~~ </td></tr>
+</table>
+
+<h3>Details</h3>
+
+<p>
+The function is also called internally by caic and macrocaic to provide a model frame for the 'lm' object.
+</p>
+
+
+<h3>Value</h3>
+
+<p>
+A data frame containing</p>
+
+<h3>Author(s)</h3>
+
+<p>
+David Orme
+</p>
+
+
+<h3>See Also</h3>
+
+<p>
+<code><a href="caic.html">caic</a></code>,<code>macrocaic</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+data(SmallTree)
+caicMod &lt;- caic(othervar ~ weight, phy=diTree, data=SmallTreeDat, names.col=tip)
+caic.table(caicMod)
+
+</pre>
+
+
+
+<hr><div align="center">[Package <em>CAIC</em> version 1.0 <a href="00Index.html">Index]</a></div>
+
+</body></html>

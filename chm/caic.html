@@ -1,0 +1,148 @@
+<html><head><title>Comparative analysis by independent contrasts.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="Rchm.css">
+</head>
+<body>
+
+<table width="100%"><tr><td>caic(CAIC)</td><td align="right">R Documentation</td></tr></table><object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+<param name="keyword" value="R:   caic">
+<param name="keyword" value="R:   contrCalc">
+<param name="keyword" value=" Comparative analysis by independent contrasts.">
+</object>
+
+
+<h2>Comparative analysis by independent contrasts.</h2>
+
+
+<h3>Description</h3>
+
+<p>
+Calculate a linear model using phylogenetic independent contrasts using a formula interface.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+caic(formula, data, phy, names.col, contr.type = "Crunch", stand.contr = TRUE, ref.var = NULL, node.depth = NULL, crunch.brlen = NULL, macroMinSize = 3, equal.branch.length = FALSE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>formula</code></td>
+<td>
+A model formula.</td></tr>
+<tr valign="top"><td><code>data</code></td>
+<td>
+A data frame containing the variables specified in the model formula. The data frame can contain missing data for explanatory variables.</td></tr>
+<tr valign="top"><td><code>phy</code></td>
+<td>
+An object of class 'phylo' giving the phylogenetic structure in the data.</td></tr>
+<tr valign="top"><td><code>names.col</code></td>
+<td>
+A name specifying the column in 'data' that matches rows to tips in 'phy'.</td></tr>
+<tr valign="top"><td><code>contr.type</code></td>
+<td>
+Specifies whether to calculate contrasts using the 'Crunch' or 'Brunch' algorithm. See details.</td></tr>
+<tr valign="top"><td><code>stand.contr</code></td>
+<td>
+A logical flag indicating whether or not to standardize contrasts</td></tr>
+<tr valign="top"><td><code>ref.var</code></td>
+<td>
+A reference variable present in the model that is used to specify the direction of calculation for polytomies. If null, this is assumed to be the first explanatory variable.</td></tr>
+<tr valign="top"><td><code>node.depth</code></td>
+<td>
+A positive integer greater than 1 used to restrict the model to contrasts with a node depth less than or equal to the specified depth. Tips have a depth of 1.</td></tr>
+<tr valign="top"><td><code>crunch.brlen</code></td>
+<td>
+The internal branch length used for calculating contrasts at a polytomy. </td></tr>
+<tr valign="top"><td><code>equal.branch.length</code></td>
+<td>
+If set to 'TRUE' then all branch lengths are set to 2.</td></tr>
+</table>
+
+<h3>Details</h3>
+
+<p>
+These functions  implement methods for modelling the relationship between variables that are phylogenetically non-independent. The method was first described by Felsenstein (1985) and subsequently extended to permit the use of phylogenies with polytomies by Pagel (1992). These methods were previously implemented in the Mac Classic computer programs CAIC, written by Andy Purvis, Andy Rambaut (Purvis and Rambaut, 1995) and updated by Nick Isaac and Paul-Michael Agapow.
+</p>
+<p>
+The user provides a data frame and a phylogeny. These are matched using <code>names.col</code> to identify a column in the data frame that contains tip labels on the phylogeny. The formula specifies the model to be fitted and contrasts are calculated in those variables. The specified reference variable is used to ensure that contrasts for multivariate models are calculated in a consistent direction at each node. The function <code>caic</code> acts as a data preparation wrapper, finding the union between the phylogeny and data and reducing the dataset to the correct model and response matrices. The prepared data is then sent to the <code>contrCalc</code> engine, which is not intended to be called by users.
+</p>
+<p>
+The resulting table of contrasts is then used to fit the specified model - note that the intercept is automatically dropped from the model if present, following REFHERE. 
+</p>
+<p>
+Missing data notes here...
+</p>
+<p>
+The functions can be used to calculate either 'Crunch' or 'Brunch' style contrasts. More info here...
+Polytomies - more detail here The Mac Classic program CAIC used 1 for both 'Brunch' and 'Crunch' analyses and this the default.
+</p>
+
+
+<h3>Value</h3>
+
+<p>
+A list containing the following:
+</p>
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+A list containing the internal node numbers, the contrasts, nodal values from the phylogeny ...EXTEND... </td></tr>
+<tr valign="top"><td><code>phy</code></td>
+<td>
+A 'phylo' object describing the phylogeny used to calculate contrasts. This is the phylogeny in the original call reduced to those tips that are also named in the provided data but possibly including tips with missing data.</td></tr>
+<tr valign="top"><td><code>lm</code></td>
+<td>
+An 'lm' object containing a regression model through the origin for the calculated contrasts</td></tr>
+</table>
+
+<h3>Author(s)</h3>
+
+<p>
+David Orme
+</p>
+
+
+<h3>References</h3>
+
+<p>
+Felsenstein, J.  (1985).  Phylogenies and the comparative method.  Am. Nat.  125, 1–15
+Pagel, M. D. (1992). A method for the analysis of comparative data.  J. theor. Biol. 156, 431-442.
+Purvis, A. and Rambaut, A. (1995) Comparative analysis by independent contrasts (CAIC): an Apple Macintosh application for analysing comparative data.  Computer Appl. Biosciences 11, 247-251.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>
+<code><a href="caic.table.html">caic.table</a></code> for extracting a data table, <code><a href="plot.caic.html">plot.caic</a></code> for contrast plots, <code>summary.caic</code> for a data and model summary.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+data(SmallTree)
+caicMod &lt;- caic(othervar ~ weight, phy=diTree, data=SmallTreeDat, names.col=tip)
+
+summary(caicMod)
+
+# plot the contrasts
+caicTab &lt;- caic.table(caicMod)
+plot(othervar ~ weight, data=caicTab)
+
+# for the actual model diagnostics
+plot(caicMod)
+
+</pre>
+
+
+
+<hr><div align="center">[Package <em>CAIC</em> version 1.0 <a href="00Index.html">Index]</a></div>
+
+</body></html>

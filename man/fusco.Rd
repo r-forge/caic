@@ -1,0 +1,77 @@
+\name{fusco.test}
+\alias{fusco.test}
+\alias{fusco.calc}
+\alias{fusco.simulate}
+\alias{fusco.null.tree}
+\alias{summary.fusco}
+\alias{print.fusco}
+\alias{plot.fusco}
+
+
+\title{Imbalance statistics using Fusco and Cronk's method.} 
+\description{
+Fusco and Cronk (1995) described a method for testing the imbalance of phylogenetic trees based on looking at the distribution of I. I is calculated using the number of tips descending from each side of a bifurcating node using the formula I = (B-m)/(M-m) and is bounded between 0 (a perfectly balanced node) and 1 (maximum imbalance). B is the larger number of tips descending from each branch, M is the maximum size of this larger group (i.e. a 1 : (S-1) split, where S is the total number of descendent tips), and m is the minimum size of the larger group (ceiling of S/2).
+
+The method can cope with small proportions of polytomies in the phylogeny and these are not used in calculating balance statistics. It can also incorporate information about species richness at the tips of the phylogeny and can therefore be used to distinguish between an unbalanced topology and the unbalanced distribution of diversity at the tips of a phylogeny. Purvis et al. (2002) demonstrated that I is not independent of the node size S and proposed a modification (I') that corrects this to give a statistic with an expected median of 0.5.
+}
+\usage{
+fusco.test(phy, rich = NULL, data = NULL, names = NULL, simulate=TRUE, sim.reps=1000, sim.CI = 0.95)
+fusco.calc(phy, rich)
+fusco.simulate <- function(obj, sim.reps=1000, sim.CI = 0.95)
+fusco.null.tree <- function(nTips, nSpecies)
+\method{print}{fusco}(obj, ...)
+\method{summary}{fusco}(obj, ...)
+\method{plot}{fusco}(x, correction=TRUE, nBins=10, right=FALSE)
+}
+%- maybe also 'usage' for other objects documented here.
+\arguments{
+  \item{phy}{An object of class 'phylo'.}
+  \item{data}{A data frame containing species richness values.}
+  \item{names}{A variable in \code{data} identifying tip labels.}
+  \item{rich}{A variable in \code{data} identifying species richness.}
+  \item{simulate}{Use simulated Markov trees to generate confidence intervals on median I and quartile deviation.}
+  \item{sim.reps}{Number of trees to simulate}
+  \item{sim.CI}{Width of confidence intervals required.}
+  \nTips{The number of tips in the tree to be simulated.}
+  \nSpecies{The number of species distributed across those tips.}
+  \item{obj}{An object of class 'fusco'.}
+  \item{x}{A object of class 'fusco'.}
+  \item{correction}{Apply the correction described in Appendix A of Fusco and Cronk (1995) to the histogram of nodal imbalance.}
+  \item{nBins}{The number of bins to be used in the histogram of nodal imbalance.}
+  \item{right}{Use right or left open intervals in plotting the distribution and calculating the correction}
+}
+\details{
+I is calculated only at bifurcating nodes giving rise to more than 3 tips (or more than 3 species at the tips): nodes with three or fewer descendants have no variation in I and are not informative in assessing imbalance. The expected distribution of the nodal imbalance values between 0 and 1 is theoretically uniform under a Markov null model. However, the range of possible I values at a node is constrained by the number of descendent species. For example, for a node with 8 species, only the values 0, 0.33, 0.66, 1 are possible, corresponding to 4:4, 5:3, 6:2 and 7:1 splits (Fusco and Cronk, 1995). As node size increases, this departure from a uniform distribution decreases. The plot method incorporates a correction, described by Fusco and Cronk (1995), that uses the distribution of all possible splits at each node to characterize and correct for the departure from uniformity.
+}
+\value{
+The function \code{fusco.test} produces an object of class 'fusco' containing:
+	\item{observed}{A data frame of informative nodes showing nodal imbalance statistics.}
+	\item{median}{The median value of I.}
+	\item{qd}{The quartile deviation of I.}
+	\item{tipsAsSpecies}{A logical indicating whether the tips of the trees were treated as species or higher taxa.}
+	\item{nInformative}{The number of informative nodes.}
+	\item{nSpecies}{The number of species distributed across the tips.}
+	\item{nTips}{The number of tips.}
+If \code{simulate} is TRUE, or the user calls \code{fusco.simulate} on a 'fusco' object, then the following are also present.
+	\item{simulated}{A data frame of median and quartile deviation in I from each simulated tree.}
+	\item{sim.median}{A vector of length 2 giving confidence intervals in median I from simulated trees.}
+	\item{sim.qd}{A vector of length 2 giving confidence intervals in quartile deviation of I from simulated trees.}
+	\item{sim.reps}{The number of replicates used.}
+	\item{sim.CI}{The confidence levels used.}
+}
+
+\references{
+Fusco, G. & Cronk, Q.C.B. (1995) A New Method for Evaluating the Shape of Large Phylogenies. J. theor. Biol. 175, 235-243
+Purvis A.,  Katzourakis A. & Agapow, P-M (2002) Evaluating Phylogenetic Tree Shape: Two Modifications to Fusco & Cronk's Method. J. theor. Biol. 214, 93-103.
+}
+\author{David Orme, Andy Purvis}
+\examples{
+data(fusco)
+birdFuscoTest <- fusco.test(fuscoBirdTree, fuscoBirdData, nSpp, tipLab, sim.reps=100)
+plot(birdFuscoTest)
+summary(birdFuscoTest)
+}
+% Add one or more standard keywords, see file 'KEYWORDS' in the
+% R documentation directory.
+\keyword{ ~kwd1 }
+\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
