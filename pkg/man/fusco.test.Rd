@@ -11,9 +11,9 @@
 
 \title{Imbalance statistics using Fusco and Cronk's method.} 
 \description{
-Fusco and Cronk (1995) described a method for testing the imbalance of phylogenetic trees based on looking at the distribution of I. I is calculated using the number of tips descending from each side of a bifurcating node using the formula I = (B-m)/(M-m) and is bounded between 0 (a perfectly balanced node) and 1 (maximum imbalance). B is the larger number of tips descending from each branch, M is the maximum size of this larger group (i.e. a 1 : (S-1) split, where S is the total number of descendent tips), and m is the minimum size of the larger group (ceiling of S/2).
+Fusco and Cronk (1995) described a method for testing the imbalance of phylogenetic trees based on looking at the distribution of I. I is calculated using the number of tips descending from each side of a bifurcating node using the formula I = (B-m)/(M-m) and is bounded between 0 (a perfectly balanced node) and 1 (maximum imbalance). B is the larger number of tips descending from each branch, M is the maximum size of this larger group (i.e. a 1 : (S-1) split, where S is the total number of descendent tips), and m is the minimum size of the larger group (ceiling of S/2). The method can cope with small proportions of polytomies in the phylogeny and these are not used in calculating balance statistics. It can also incorporate information about species richness at the tips of the phylogeny and can therefore be used to distinguish between an unbalanced topology and the unbalanced distribution of diversity at the tips of a phylogeny. 
 
-The method can cope with small proportions of polytomies in the phylogeny and these are not used in calculating balance statistics. It can also incorporate information about species richness at the tips of the phylogeny and can therefore be used to distinguish between an unbalanced topology and the unbalanced distribution of diversity at the tips of a phylogeny. Purvis et al. (2002) demonstrated that I is not independent of the node size S and proposed a modification (I') that corrects this to give a statistic with an expected median of 0.5.
+Purvis et al. (2002) demonstrated that I is not independent of the node size S, resulting in a bias to the expected median of 0.5. They proposed a modification (I') that corrects this to give a statistic with an expected median of 0.5 regardless of node size. The defaults in this function perform testing of imbalance using I', but it is also possible to use the original measure proposed by Fusco and Cronk (1995).
 }
 \usage{
 fusco.test(phy, rich = NULL, data = NULL, names = NULL, randomise.Iprime=TRUE,  markov.simulate=FALSE, reps=1000, conf.int=0.95)
@@ -59,14 +59,17 @@ The function \code{fusco.test} produces an object of class 'fusco' containing:
 	\item{nInformative}{The number of informative nodes.}
 	\item{nSpecies}{The number of species distributed across the tips.}
 	\item{nTips}{The number of tips.}
-If \code{simulate} is TRUE, or the user calls \code{fusco.simulate} on a 'fusco' object, then the following are also present.
+	\item{reps}{The number of replicates used in randomization or tree simulation.}
+	\item{conf.int}{The confidence levels used in randomization or tree simulation.}
+If \code{markov.simulate} is TRUE, or the user calls \code{fusco.markovSimulate} on a 'fusco' object, then the following are also present.
 	\item{simulated}{A data frame of median and quartile deviation in I from each simulated tree.}
 	\item{sim.median}{A vector of length 2 giving confidence intervals in median I from simulated trees.}
 	\item{sim.qd}{A vector of length 2 giving confidence intervals in quartile deviation of I from simulated trees.}
-	\item{sim.reps}{The number of replicates used.}
-	\item{sim.CI}{The confidence levels used.}
+If \code{randomise.Iprime} is TRUE, or the user calls \code{fusco.randomize} on a 'fusco' object, then the following are also present.
+	\item{randomised}{A data frame of mean I' from the randomized observed values.}
+	\item{rand.mean}{A vector of length 2 giving confidence intervals in mean I'.}
 }
-
+randomised=randomised, rand.mean=rand.mean, reps=rand.reps, conf.int=rand.CI
 \references{
 Fusco, G. & Cronk, Q.C.B. (1995) A New Method for Evaluating the Shape of Large Phylogenies. J. theor. Biol. 175, 235-243
 Purvis A.,  Katzourakis A. & Agapow, P-M (2002) Evaluating Phylogenetic Tree Shape: Two Modifications to Fusco & Cronk's Method. J. theor. Biol. 214, 93-103.
@@ -80,5 +83,5 @@ summary(birdFuscoTest)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{utilities}
+\keyword{htest}

@@ -1,13 +1,14 @@
-`caic` <-
-function(formula, data, phy, names.col, contr.type = "Crunch",
-                  stand.contr = TRUE, ref.var=NULL, node.depth=NULL,
-                  crunch.brlen=NULL, equal.branch.length=FALSE)
+`piclm` <-
+function(formula, data, phy, names.col, stand.contr = TRUE, ref.var=NULL, node.depth=NULL,
+                  polytomy.brlen=1, equal.branch.length=FALSE, factor.action="abort")
 {
 
 
         # OLD2NEW STATUS: Converted to use new ape phylo structure
         # All geographic based contrast calculation code has been removed in order to hasten a first release of the package
         # and the caic wrapper function to contrCalc has been split to explicit caic and macrocaic wrappers 
+
+        # April 08 - further splitting of the caic function into explicit crunch versus brunch functions.
         
         # Program Flow:
         #   1) setup - check arguments, 
@@ -19,7 +20,10 @@ function(formula, data, phy, names.col, contr.type = "Crunch",
         # TODO - return node age/height
         # TODO - allow caic to be used as a contrast calculator
         # TODO - farm out common data setup in caic and macrocaic to a single function.
+        # TODO - more error checking on inputs
         
+        # TODO - for .Rd: polytomy.brlen = intermediate branch length to use at polytomies - CAIC used 1 but this is not fixed
+       
         # CHECKS AND SETUP
 
         # record call and dataset names
@@ -27,18 +31,11 @@ function(formula, data, phy, names.col, contr.type = "Crunch",
         phyName <- deparse(substitute(phy))
         dataName <- deparse(substitute(data))
 
-        # check inputs are what they should be TODO FILL THIS OUT
+        # check inputs are what they should be 
         # if(! is.formula(formula)) stop("'formula' must be an object of class 'formula'.")
         if(! is.data.frame(data)) stop("'data' must be an object of class 'data.frame'.")
         
-
-        # match arguments to acceptable values
-        match.arg(contr.type, c("Crunch", "Brunch")) 
-        
-        # if not imposed, set intermediate branch length to use at polytomies - CAIC used 1 but this is not fixed
-        if(is.null(crunch.brlen)) crunch.brlen <- 1
-        
-        # check node.depth
+         # check node.depth
         if(! is.null(node.depth)){
             if(node.depth%%1 != 0 || node.depth < 1) stop("node.depth must be a positive integer greater than 1.")
         }
@@ -49,7 +46,7 @@ function(formula, data, phy, names.col, contr.type = "Crunch",
         if(! is.rooted(phy))
             stop("'", deparse(substitute(phy)), "' is not rooted.")
         
-        if(as.logical(equal.branch.length)) {# doesn't get evaluated if FALSE or zero
+        if(as.logical(equal.branch.length)) { # doesn't get evaluated if FALSE or zero
             phy$edge.length <- rep(2, length(phy$edge.length))
         }
         
@@ -62,6 +59,8 @@ function(formula, data, phy, names.col, contr.type = "Crunch",
         }
         data[,namesInd] <- as.character(data[,namesInd])
         
+        # check for factor.action
+        factor.action <- match.arg(factor.action, c("abort", "warn", "ignore"))
 
     # DATA MATCHING AND REDUCTION
         # store original dataset size
@@ -82,6 +81,7 @@ function(formula, data, phy, names.col, contr.type = "Crunch",
         # ii >> ditch tips which have no rows.
         tip.in.data <-  match(phy$tip.label, in.both)
         to.drop <- phy$tip.label[is.na(tip.in.data)]
+        
         #  get subset of phylogeny to be used
         if(length(to.drop) > 0) analysisPhy <- drop.tip(phy, to.drop) else analysisPhy <- phy
         
@@ -89,83 +89,67 @@ function(formula, data, phy, names.col, contr.type = "Crunch",
         root <- with(analysisPhy, (max(edge) - Nnode) + 1)
         
 
-         # get the data into the same order as the tips
+        # get the data into the same order as the tips
         tip.order <- match(analysisPhy$tip.label, data[,namesInd])
         if(any(is.na(tip.order))) stop("Problem with sorting data frame: mismatch between tip labels and data frame labels")
         data <- data[tip.order,]
+        
         # Label the data frame rows by tip number to allow the tree to be traversed
         rownames(data) <- 1:dim(data)[1]
         
         # Size of conjunction of tree and dataset
         unionData <- dim(data)[1] 
 
-    # GET THE BASIC MODEL MATRICES
+        # reduce to just the variables used in the formula
+        data <- subset(data, select=all.vars(formula))
         
-        # drop any intercept from the formula
-        formula <- update(formula, . ~ . - 1) # no effect if the interecept is already omitted         
-        # Get the model frame including missing data
-        # and check the number of complete cases in the model frame
-        initMf <- model.frame(formula, data, na.action="na.pass")
-        initMfComplete <- complete.cases(initMf)
-        # TODO - think whether this check is always sufficient...
-        if(sum(initMfComplete) < 2 ) stop("Fewer than two taxa contain complete data for this analysis")
+    # HANDLE CATEGORICAL VARIABLES:
+        # find the factors - (number of levels > 0)
+        varLevels <- sapply(data, function(x) length(levels(x)))
+        varIsOrdered <- sapply(data, is.ordered)
         
+        if(any( varLevels > 0 )){
+            
+            # check for unordered multi states...
+            if(any( varLevels > 2 & ! varIsOrdered )) stop("Unordered non-binary factors included in model formula.")
+            
+            # otherwise check for action on viable factors...
+            
+            if(factor.action == "abort"){
+                stop("The formula includes factors. Change the factor.action argument to allow these to be fitted as numeric variables.")
+            } else if(factor.action == "warn"){
+                warning("The formula includes factors, which have been treated as continuous variables ")
+            }
+            
+            data <- as.data.frame(lapply(data, as.numeric))
+            
+        }
+                
     # CALCULATE MODEL 
     # GET THE MODEL MATRIX and Model Response
         
+        # ditch the intercept, if present
+        formula <- update(formula, . ~ . - 1)
+        
         # now we have the union of the phylogeny and data
         # get the model frame, matrix and response
-        # these show the values at the tips for each term 
+        # these show the values at the tips for each term
         mf <- model.frame(formula, data, na.action=na.pass)
-        
 
-        # HANDLE CATEGORICAL VARIABLES:
-        # find the factors
-        varClass <- attributes(attributes(mf)$terms)$dataClasses
-        termFactors <- attributes(attributes(mf)$terms)$factors
-    
-        factorCols <- names(varClass)[varClass %in% c("ordered","factor")]
+        # is there enough data in the model
+        # TODO - think whether this check is always sufficient. 
+        mfComplete <- complete.cases(mf)
+        if(sum(mfComplete) < 2 ) stop("Fewer than two taxa contain complete data for this analysis")
 
-        # currently, want to exclude the possibility of interactions in a factor
-        # in Brunch because I don't have a clue how that should be handled
-        # and also need a vector showing which terms are categorical and numeric
-        # in order to allow correct standardization of contrasts 
-        if(contr.type=="Brunch"){
-            if(any(varClass %in% c("ordered","factor") & rowSums(termFactors) > 1)){
-                stop("Interactions using categorical variables not supported in Brunch analyses")}
-            termClass <- apply(termFactors,2,function(X) unique(varClass[as.logical(X)]))
-         } else {
-             # there could be no terms with a model of the form ~ 1.
-             if(length(termFactors) == 0){
-                 termClass <- numeric(0)
-             } else {
-                 termClass <- rep("numeric", dim(termFactors)[2]) # all variables treated as numeric...
-             }             
-         }
-     
-        for(fact in factorCols){
-            # - check whether all factors are ordered or binary
-            currFact <- with(mf, get(fact))
-            lev <-  levels(currFact)
-            ord <- is.ordered(currFact)
-            if(length(lev) > 2 & ! ord) stop("Unordered non-binary factor included in model formula.")
-             # - In both crunch and brunch, all factors become numeric but are
-            #   then treated differently by the contrast calculation engine. 
-            # - modify the model frame object to make the factors numeric
-            # - quote the names of the variables to assign to
-             eval(parse(text=paste("mf$'", fact, "'<- as.numeric(currFact)", sep=""))) 
-             attr(mf, "dataClasses") <- rep("numeric", dim(termFactors)[2])
-        }
-            
         # get the design matrix
         md <- model.matrix(formula, mf) 
 
         # sort out the reference variable
-        if(! deparse(substitute(ref.var)) == "NULL"){ # this is a bit ugly but can't think of the canonical method right now...
+        if( is.null(ref.var)){
+            ref.var <- colnames(md)[1] # first column in the design matrix
+        } else {
             ref.var <- deparse(substitute(ref.var))
             if(is.na(match(ref.var, colnames(md)))) stop("Reference variable not found in design matrix")
-        } else {
-            ref.var <- colnames(md)[1]
         }
 
         # MODEL RESPONSE
@@ -181,28 +165,18 @@ function(formula, data, phy, names.col, contr.type = "Crunch",
 
     # NOW SETUP TO GET CONTRASTS AND NODAL VALUES
         # We know the tip values, the analysis tree         
-        contr <- contrCalc(md, analysisPhy, ref.var, contr.type, crunch.brlen)
+        contr <- piclmCalc(md, analysisPhy, ref.var)
 
     # GET RESPONSE MATRIX
-        # first column of contrasts is response
-        mrC <- contr$contr[,1,drop=FALSE]
-        mdC <- contr$contr[,-1,drop=FALSE]
-
-    # standardize the contrasts if required 
-    # (never standardize categorical variables in Brunch)
-    
-        if(stand.contr){
-            notCateg <- ! termClass %in% c("factor","ordered")
-            mdC[,notCateg] <- mdC[,notCateg, drop=FALSE]/sqrt(contr$var.contr)
-            mrC <- mrC/sqrt(contr$var.contr)
-        }
-    
+        # standardize the contrasts if required     
+        if(stand.contr)  contr$contr <- contr$contr/sqrt(contr$var.contr)
+      
     # FEED THE RETURNED DESIGN AND RESPONSE MATRICES INTO THE MODELLING FUNCTIONS
         # assemble the data into a finished contrast object
 
         ContrObj <- list()
-        ContrObj$contr$response <- mrC[,,drop=FALSE]
-        ContrObj$contr$explanatory <- mdC
+        ContrObj$contr$response <- contr$contr[,1,drop=FALSE]
+        ContrObj$contr$explanatory <- contr$contr[,-1,drop=FALSE]
         ContrObj$nodalVals$response <- contr$nodVal[as.numeric(rownames(contr$nodVal)) >= root,1,drop=FALSE]
         ContrObj$nodalVals$explanatory <- contr$nodVal[as.numeric(rownames(contr$nodVal)) >= root,-1,drop=FALSE]            
         ContrObj$contrVar <- contr$var.contr
@@ -232,6 +206,8 @@ function(formula, data, phy, names.col, contr.type = "Crunch",
                  
         # save for the user
         ContrObj$validNodes <- validNodes
+        
+        browser()
         
         # feed the contr.model.response and contr.model.matrix
         # into lm.fit to get the model and then set up the lm object
@@ -263,8 +239,7 @@ function(formula, data, phy, names.col, contr.type = "Crunch",
        attr(RET, "unionData") <- unionData
        attr(RET, "phyName") <- phyName 
        attr(RET, "dataName") <- dataName
-       attr(RET, "contr.method") <- "caic"
-       attr(RET, "contr.type") <- contr.type
+       attr(RET, "contr.method") <- "crunch"
        attr(RET, "stand.contr") <- stand.contr
        
        return(RET)

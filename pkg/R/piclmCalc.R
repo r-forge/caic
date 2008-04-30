@@ -1,19 +1,6 @@
-`contrCalc` <-
-function(vals, phy, ref.var, picMethod, crunch.brlen){
+`piclmCalc` <-
+function(vals, phy, ref.var){
 
-    # OLD2NEW STATUS: CONVERTED
-    # Area contrast calculation stripped out for first release - this creates some changes in possible structure and order of operations
-    
-    # Takes the tip values and analysis tree and calculates contrasts and nodal values.
-
-    # the vals matrix needs to be numbered according to the numeric codes
-    # of the tips in the phylogeny (i.e. 1 to ntips)
-
-    # if picMethod is a macro analysis, then ref.var is a vector of nodal values,
-    # otherwise it is a reference to a column in vals. Either way, these are used to
-    # determine the direction of the calculation of contrasts
-    
-    # create matrices of nodal values and contrasts labelled by the node codes
     
     # DESIGN THOUGHTS - simpler to maintain with a single function for each type of contrast
     #                 - create an initialize function to do these shared first steps?
@@ -22,6 +9,18 @@ function(vals, phy, ref.var, picMethod, crunch.brlen){
     IntNd <- Root:max(phy$edge) 
     nIntNd <- phy$Nnode
 
+    # identify the groups contributing to each contrast
+    # going from the largest numbered internal node to the smallest
+    # should always (!? check) mean that the traversal is correct
+    contrGp <- rev(split(phy$edge[,2], as.numeric(phy$edge[,1])))
+    
+    # get the number of contrasts at each node
+    contrGpN <- sapply(contrGp, length) - 1
+    
+    # set up sub.node labels and weights
+    
+    
+    
     contrMat <- matrix(NA, ncol=dim(vals)[2], nrow=nIntNd, dimnames=list(IntNd, dimnames(vals)[[2]]))
     nodVal <- rbind(vals, contrMat)
 
@@ -32,15 +31,7 @@ function(vals, phy, ref.var, picMethod, crunch.brlen){
     contrVar <- numeric(nIntNd)
     names(contrVar) <- IntNd
 
-    # for use in brunch analyses, a vector to note whether an
-    # internal node has been used or not
-    brunchUsed <- logical(dim(nodVal)[1])
-    names(brunchUsed) <- rownames(nodVal)
 
-    # identify the groups contributing to each contrast
-    # going from the largest numbered internal node to the smallest
-    # should always (!? check) mean that the traversal is correct
-    contrGp <- rev(split(phy$edge[,2], as.numeric(phy$edge[,1])))
     
     # loop the nodes
     for(nd in seq(along=contrGp)){
@@ -130,7 +121,6 @@ function(vals, phy, ref.var, picMethod, crunch.brlen){
                                 currContr <- NA
                                 currNV <- colSums(compVals*(1/bl))/sum(1/bl)
                                 currBlAdj <- 1/(sum(1/bl))
-                                currVar <- NA
                             } else {
                  
                                 # find groupings a vector indicating whether each row 

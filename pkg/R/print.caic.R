@@ -1,7 +1,7 @@
 `print.caic` <-
 function(x, ...){
 
-    cat("Phylogenetic Independent Contrasts analysis using ",  attr(x, "contr.method"), "() with ", attr(x, "contr.type"), ".\n\n", sep="")
+    cat("Phylogenetic Independent Contrasts analysis using ",  attr(x, "contr.method"), ".\n\n", sep="")
 
     cat("Phylogeny: ", attr(x, "phyName"), " (",  attr(x, "origTips")  ," tips)\n", sep="")
     cat("Data: ",  attr(x, "dataName"), " (",  attr(x, "origData")  ," rows)\n", sep="")
