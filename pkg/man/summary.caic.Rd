@@ -21,15 +21,15 @@ The summary method returns an object of class 'summary.lm'.
 }
 
 \author{David Orme}
-\seealso{\code{\link{caic}}, \code{link{macrocaic}}}
+\seealso{\code{\link{crunch}},\code{\link{brunch}}, \code{link{macrocaic}}}
 \examples{
 
 data(SmallTree)
-caicMod <- caic(othervar ~ weight, phy=diTree, data=SmallTreeDat, names.col=tip)
-print(caicMod)
+crunchMod <- crunch(othervar ~ weight, phy=diTree, data=SmallTreeDat, names.col=tip)
+print(crunchMod)
 
-caicModSummary <- summary(caicMod)
-coef(caicModSummary)
+crunchModSummary <- summary(crunchMod)
+coef(crunchModSummary)
 
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

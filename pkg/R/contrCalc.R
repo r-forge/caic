@@ -126,27 +126,24 @@ function(vals, phy, ref.var, picMethod, crunch.brlen){
                             if(any(bl < 0)) stop("Crunch contrast calculation at a polytomy gives negative branch lengths.")
                             
                             # is there any variance in the reference variable?
-                           if(var(rv) == 0){ # weighted average of data
-                                currContr <- NA
-                                currNV <- colSums(compVals*(1/bl))/sum(1/bl)
-                                currBlAdj <- 1/(sum(1/bl))
-                                currVar <- NA
-                            } else {
-                 
+                           if(var(rv) == 0){ 
+                               # compare first to the rest (as in CAIC)
+                                group <- c(TRUE, rep(FALSE, length(rv) -1))
+                           } else {
                                 # find groupings a vector indicating whether each row 
                                 # is bigger or smaller than the mean of reference variable or is NA
-                                group <- (rv > mean(rv, na.rm=TRUE)) # TODO - think >= or >?
-                         
-                                ProdValBl <- aggregate(compVals * (1/bl), by=list(group), FUN=sum)[,-1]
-                                SumWght <- aggregate((1/bl), by=list(group), FUN=sum)[,-1]
-                                subNV <- as.matrix(ProdValBl/SumWght)
-                                subBL <- crunch.brlen + (1 / SumWght)
-                         
-                                currContr <- diff(subNV)
-                                currNV <- colSums(subNV*(1/subBL))/sum(1/subBL) # weighted means
-                                currVar <- sum(subBL)
-                                currBlAdj <- 1/(sum(1/subBL))
-                            }
+                                group <- (rv > mean(rv, na.rm=TRUE)) # TODO - think >= or >?                               
+                           }
+                     
+                            ProdValBl <- aggregate(compVals * (1/bl), by=list(group), FUN=sum)[,-1]
+                            SumWght <- aggregate((1/bl), by=list(group), FUN=sum)[,-1]
+                            subNV <- as.matrix(ProdValBl/SumWght)
+                            subBL <- crunch.brlen + (1 / SumWght)
+                     
+                            currContr <- diff(subNV)
+                            currNV <- colSums(subNV*(1/subBL))/sum(1/subBL) # weighted means
+                            currVar <- sum(subBL)
+                            currBlAdj <- 1/(sum(1/subBL))
                         }
                     } else {
                         # no complete cases so pass NA down to the parent node

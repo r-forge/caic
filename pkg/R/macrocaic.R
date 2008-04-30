@@ -166,7 +166,7 @@ function(formula, data, phy, names.col, macroMethod = "RRD", stand.contr = TRUE,
 
     # NOW SETUP TO GET CONTRASTS AND NODAL VALUES
         # We know the tip values, the analysis tree         
-        contr <- contrCalc(md, analysisPhy, ref.var, picMethod="Crunch", crunch.brlen)
+        contr <- contrCalc(md, analysisPhy, ref.var, picMethod="crunch", crunch.brlen)
 
     # GET RESPONSE MATRIX
         #  - macroMf is in tip order from interPhy but needs rownumbering accordingly

@@ -24,11 +24,11 @@ The function is also called internally by caic and macrocaic to provide a model 
 A data frame containing TODO
 }
 \author{David Orme}
-\seealso{ \code{\link{caic}},\code{\link{macrocaic}}}
+\seealso{ \code{\link{crunch}},\code{\link{brunch}},\code{\link{macrocaic}}}
 \examples{
 data(SmallTree)
-caicMod <- caic(othervar ~ weight, phy=diTree, data=SmallTreeDat, names.col=tip)
-caic.table(caicMod)
+crunchMod <- crunch(othervar ~ weight, phy=diTree, data=SmallTreeDat, names.col=tip)
+caic.table(crunchMod)
 
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

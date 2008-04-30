@@ -63,17 +63,17 @@ Purvis, A. and Rambaut, A. (1995) Comparative analysis by independent contrasts 
 \examples{
 
 data(SmallTree)
-caicMod <- caic(othervar ~ weight, phy=diTree, data=SmallTreeDat, names.col=tip)
+crunchMod <- crunch(othervar ~ weight, phy=diTree, data=SmallTreeDat, names.col=tip)
 
-summary(caicMod)
+summary(crunchMod)
 
 # plot the contrasts
-caicTab <- caic.table(caicMod)
-plot(othervar ~ weight, caicTab)
+crunchTab <- caic.table(crunchMod)
+plot(othervar ~ weight, crunchTab)
 
 # for the actual model diagnostics
 par(mfrow=c(3,1))
-caic.diagnostics(caicMod)
+caic.diagnostics(crunchMod)
 
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

@@ -33,5 +33,5 @@ Agapow, P.-M. and Isaac, N. J. B. (2002) MacroCAIC: correlates of species richne
 }
 \examples{
 data(SmallTree)
-caic(othervar ~ weight, phy=diTree, data=SmallTreeDat, names.col=tip)
+crunch(othervar ~ weight, phy=diTree, data=SmallTreeDat, names.col=tip)
 }

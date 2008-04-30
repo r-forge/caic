@@ -1,6 +1,6 @@
 `piclm` <-
 function(formula, data, phy, names.col, stand.contr = TRUE, ref.var=NULL, node.depth=NULL,
-                  polytomy.brlen=1, equal.branch.length=FALSE, factor.action="abort")
+                  equal.branch.length=FALSE, factor.action="abort")
 {
 
 

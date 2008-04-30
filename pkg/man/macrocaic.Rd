@@ -45,7 +45,7 @@ Felsenstein, J.  (1985).  Phylogenies and the comparative method.  Am. Nat.  125
 Agapow, P.-M. and Isaac, N. J. B. (2002) MacroCAIC: correlates of species richness. Diversity & Distributions, 8, 41-43
 }
 \author{David Orme}
-\seealso{\code{\link{caic}}, \code{vignette(caic)}}
+\seealso{\code{\link{crunch}}, \code{vignette(caic)}}
 \examples{
 
 data(SmallTree)

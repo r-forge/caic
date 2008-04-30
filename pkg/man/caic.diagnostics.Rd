@@ -35,11 +35,11 @@ If \code{test.signif} is TRUE, a list with class `caic.diagonistics' containing,
 }
 \references{ ~put references to the literature/web site here ~ }
 \author{ David Orme }
-\seealso{\code{\link{caic}}, \code{\link{macrocaic}}}
+\seealso{\code{\link{crunch}}, \code{\link{brunch}}, \code{\link{macrocaic}}}
 \examples{
 
 data(BigTree)
-mod <- caic(yv ~ xc1 * xc2, data=BigTreeDat, phy=BigTree, names.col=species)
+mod <- crunch(yv ~ xc1 * xc2, data=BigTreeDat, phy=BigTree, names.col=species)
 
 par(mfrow=c(3,3))
 modDiag <- caic.diagnostics(mod)

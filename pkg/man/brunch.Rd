@@ -6,7 +6,7 @@
 Calculate a linear model using the brunch algorithm.
 }
 \usage{
-brunch(formula, data, phy, names.col, stand.contr = TRUE, ref.var=NULL, node.depth=NULL, polytomy.brlen=1, equal.branch.length=FALSE)
+brunch(formula, data, phy, names.col, stand.contr = TRUE, ref.var=NULL, node.depth=NULL, equal.branch.length=FALSE)
 }
 
 
@@ -18,9 +18,8 @@ brunch(formula, data, phy, names.col, stand.contr = TRUE, ref.var=NULL, node.dep
   \item{stand.contr}{A logical flag indicating whether or not to standardize contrasts}.
   \item{ref.var}{A reference variable present in the model that is used to specify the direction of calculation of contrasts. If null, this is assumed to be the first explanatory variable.}
   \item{node.depth}{A positive integer greater than 1 used to restrict the model to contrasts with a node depth less than or equal to the specified depth. Tips have a depth of 1.}
-  \item{polytomy.brlen}{The internal branch length used for calculating contrasts at a polytomy, following Pagel's (1992) method. }
   \item{equal.branch.length}{If set to 'TRUE' then all branch lengths are set to 2.}
-
+}
 
 \details{
 This function implements the 'brunch' algorithm for modelling the relationship between variables that are phylogenetically non-independent. [The method was first described by Felsenstein (1985) and subsequently extended to permit the use of phylogenies with polytomies by Pagel (1992) - correct this...]. This method was previously implemented in the Mac Classic computer programs CAIC, written by Andy Purvis, Andy Rambaut (Purvis and Rambaut, 1995) and updated by Nick Isaac and Paul-Michael Agapow.
@@ -61,17 +60,17 @@ Purvis, A. and Rambaut, A. (1995) Comparative analysis by independent contrasts 
 \examples{
 
 data(SmallTree)
-caicMod <- caic(othervar ~ weight, phy=diTree, data=SmallTreeDat, names.col=tip)
+brunchMod <- brunch(othervar ~ catX2, phy=diTree, data=SmallTreeDat, names.col=tip)
 
-summary(caicMod)
+summary(brunchMod)
 
 # plot the contrasts
-caicTab <- caic.table(caicMod)
-plot(othervar ~ weight, caicTab)
+brunchTab <- caic.table(brunchMod)
+plot(othervar ~ catX2, brunchTab)
 
 # for the actual model diagnostics
 par(mfrow=c(3,1))
-caic.diagnostics(caicMod)
+caic.diagnostics(brunchMod)
 
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
