@@ -1,13 +1,13 @@
 \name{caic}
-\alias{caic}
-\alias{contrCalc}
+\alias{piclm}
+\alias{piclmCalc}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{Comparative analysis by independent contrasts.}
+\title{Comparative analysis by independent contrasts using the 'piclm' algorithm.}
 \description{
 Calculate a linear model using phylogenetic independent contrasts using a formula interface.
 }
 \usage{
-caic(formula, data, phy, names.col, contr.type = "Crunch", stand.contr = TRUE, ref.var = NULL, node.depth = NULL, crunch.brlen = NULL, equal.branch.length = FALSE)
+piclm(formula, data, phy, names.col, contr.type = "Crunch", stand.contr = TRUE, ref.var = NULL, node.depth = NULL, crunch.brlen = NULL, equal.branch.length = FALSE)
 }
 
 
@@ -25,16 +25,9 @@ caic(formula, data, phy, names.col, contr.type = "Crunch", stand.contr = TRUE, r
 }
 
 \details{
-These functions  implement methods for modelling the relationship between variables that are phylogenetically non-independent. The method was first described by Felsenstein (1985) and subsequently extended to permit the use of phylogenies with polytomies by Pagel (1992). These methods were previously implemented in the Mac Classic computer programs CAIC, written by Andy Purvis, Andy Rambaut (Purvis and Rambaut, 1995) and updated by Nick Isaac and Paul-Michael Agapow.
 
-The user provides a data frame and a phylogeny. These are matched using \code{names.col} to identify a column in the data frame that contains tip labels on the phylogeny. The formula specifies the model to be fitted and contrasts are calculated in those variables. The specified reference variable is used to ensure that contrasts for multivariate models are calculated in a consistent direction at each node. The function \code{caic} acts as a data preparation wrapper, finding the union between the phylogeny and data and reducing the dataset to the correct model and response matrices. The prepared data is then sent to the \code{contrCalc} engine, which is not intended to be called by users.
+Not functional or complete - will use the method implemented in the 'pendek' function piclm()...
 
-The resulting table of contrasts is then used to fit the specified model - note that the intercept is automatically dropped from the model if present, following REF HERE. 
-
-Missing data notes here...
-
-The functions can be used to calculate either 'Crunch' or 'Brunch' style contrasts. More info here...
-Polytomies - more detail here The Mac Classic program CAIC used 1 for both 'Brunch' and 'Crunch' analyses and this the default.
 
 
 }
@@ -58,7 +51,7 @@ Pagel, M. D. (1992). A method for the analysis of comparative data.  J. theor. B
 Purvis, A. and Rambaut, A. (1995) Comparative analysis by independent contrasts (CAIC): an Apple Macintosh application for analysing comparative data.  Computer Appl. Biosciences 11, 247-251.
 }
 
-\author{David Orme}
+\author{David Orme; Andy Purvis}
 
 \seealso{\code{\link{caic.table}} for extracting a data table, \code{\link{summary.caic}} for a data and model summary and \code{\link{caic.diagnostics}} for model checking.}
 \examples{

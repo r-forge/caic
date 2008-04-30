@@ -60,7 +60,7 @@ function(formula, data, phy, names.col, stand.contr = TRUE, ref.var=NULL, node.d
         data[,namesInd] <- as.character(data[,namesInd])
         
         # check for factor.action
-        factor.action <- match.arg(factor.action, c("abort", "warn", "ignore"))
+        factor.action <- match.arg(factor.action, c("abort", "warn", "allow"))
 
     # DATA MATCHING AND REDUCTION
         # store original dataset size

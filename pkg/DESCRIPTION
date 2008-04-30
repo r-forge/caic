@@ -1,8 +1,8 @@
 Package: CAIC
 Type: Package
 Title: Comparative Analyses using Independent Contrasts
-Version: 1.0.1
-Date: 2007-12-12
+Version: 1.0.2
+Date: 2008-04-30
 Author: David Orme
 Maintainer: David Orme <d.orme@imperial.ac.uk>
 Depends: R (>= 2.6.0), ape, MASS
