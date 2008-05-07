@@ -1,7 +1,7 @@
 growTree <- function(b=1,d=0,halt=20, grain=0.1, linObj=NULL,
                      ct.start=NULL, ct.change=NULL, ct.var=NULL, dt.rates=NULL,
                      inheritance=NULL, trace=FALSE, output.phylo=TRUE, 
-                     neg.rates="abort", inf.rates="abort", stall.time=10){
+                     neg.rates="abort", inf.rates="abort", stall.time=10, extend.proportion=0){
 
     # CHANGES 0.2 to 0.3 - use a data.frame rather than a list for lineages. 
     # TODO - dt.rates can be modified based on lineage properties, but there is
@@ -122,7 +122,7 @@ growTree <- function(b=1,d=0,halt=20, grain=0.1, linObj=NULL,
 	# convert them all into a list of 'rules'
 	# SPECIATION RULE(S)
 	switch(mode(b),
-    	"numeric" = if(length(b) > 1 | b < 0) stop("Speciation rate 'b' is numeric but not a positive scalar") else b <- list(b),
+    	"numeric" = if(length(b) > 1 | b < 0) stop("Speciation rate 'b' is numeric but not a positive scalar") else b <- list(as.expression(b)),
     	"expression"= if( ! validExpr(b)) stop("Speciation expression 'b' contains unknown variables.") else b <- list(b),
     	"list" =   {if(! all(sapply(b, mode) == "expression")) stop("The list 'b' must be a list of expressions")
     				if(! all(sapply(b, validExpr))) stop("One or more expressions in the list 'b' contain unknown variables")},
@@ -133,10 +133,10 @@ growTree <- function(b=1,d=0,halt=20, grain=0.1, linObj=NULL,
 	
 	# EXTINCTION RULE(S)
 	switch(mode(d),
-    	"numeric" = if(length(d) > 1 | d < 0) stop("Extinction rate 'd' is numeric but not a positive scalar") else d <- list(d),
+    	"numeric" = if(length(d) > 1 | d < 0) stop("Extinction rate 'd' is numeric but not a positive scalar") else d <- list(as.expression(d)),
     	"expression"= if( ! validExpr(d)) stop("Extinction expression 'd' contains unknown variables.") else d <- list(d),
-    	"list" =   {if(! all(sapply(b, mode) == "expression")) stop("The list 'd' must be a list of expressions")
-    				if(! all(sapply(b, validExpr))) stop("One or more expressions in the list 'd' contain unknown variables")},
+    	"list" =   {if(! all(sapply(d, mode) == "expression")) stop("The list 'd' must be a list of expressions")
+    				if(! all(sapply(d, validExpr))) stop("One or more expressions in the list 'd' contain unknown variables")},
     				stop("Extinction rate 'd' not in a recognized format."))
 
     # assign names to the list
@@ -166,15 +166,43 @@ growTree <- function(b=1,d=0,halt=20, grain=0.1, linObj=NULL,
 	# whilst anything is actually happening
 	status <- "complete"; lastRealEvent <- 0
 	
+	# A function to get a rate for each lineage from either b or d
+	# - is also used to extend the simulation after the last speciation
+	ratesCheck <- function(rateExp, lineages, inf.rates, neg.rates){
+
+        # - force multiplication by unity to extend constants across the clade
+	    unitConst <- rep(1,length(lineages$id))
+        rates <- lapply(rateExp, function(X) eval(X, env=c(lineages, clade)) * unitConst)
+	    
+        # negative rates?
+        if(any(unlist(rates) < 0)){
+                    switch(neg.rates,
+                    abort=stop("Negative rates produced"),
+                    warn=warning("Negative rates produced - setting to zero"))
+        }
+        
+        rates <- lapply(rates, function(X) ifelse(X < 0, 0, X))
+        
+        # infinite rates
+	    if(any(is.infinite(unlist(rates)))){
+            switch(inf.rates,
+                    abort=stop("Infinite rates produced"),
+                    warn=warning("Infinite rates produced"))
+        }
+        
+        # ensure extinct stay dead
+	    rates <- lapply(rates, function(X, ext) ifelse(ext, 0, X), ext=lineages$extinct)
+	    
+	    return(rates)
+	}
+	
     while( ! any(haltStatus <-sapply(halt, eval, env=c(lineages, clade)))){
         
         # evaluate the birth and death rate expressions
-        # - force multiplication by unity to extend constants across the clade
-        unitConst <- rep(1,length(lineages$id))
-        bRates <- lapply(b, function(X) eval(X, env=c(lineages, clade)) * unitConst)
-        dRates <- lapply(d, function(X) eval(X, env=c(lineages, clade)) * unitConst)
+        bRates <- ratesCheck(b, lineages)
+        dRates <- ratesCheck(d, lineages)
         
-        allRates <- c(unlist(bRates),unlist(dRates))
+        allRates <- c(unlist(bRates), unlist(dRates))
         
         # check to see if the stall criteria are met...
         if(all(allRates == 0)){
@@ -186,39 +214,17 @@ growTree <- function(b=1,d=0,halt=20, grain=0.1, linObj=NULL,
             if((clade$clade.age - lastRealEvent) > stall.time ){
                 status <- "stalled"
                 warning("Rates are all zero and stall.time is exceeded: exiting stalled simulation")
-                break # so end the simulation}
+                break # so end the simulation
             }
         }
         
-        # check these for negativity
-        if(any(allRates < 0)){
-            switch(neg.rates,
-                    abort=stop("Negative rates produced"),
-                    warn=warning("Negative rates produced - setting to zero"))
-        }
-       
-       # kill negative rates
-       bRates <- lapply(bRates, function(X) ifelse(X < 0, 0, X))
-       dRates <- lapply(dRates, function(X) ifelse(X < 0, 0, X))
-
-        # check these for infinity 
-        if(any(allRates == Inf)){
-            switch(inf.rates,
-                    abort=stop("Infinite rates produced"),
-                    warn=warning("Infinite rates produced"))
-        }
-       
        # make sure something is alive...
        if(all(lineages$extinct)) {
             status <- "extinct"
             warning("All lineages extinct: exiting simuation")
             break # everything is dead so end the simulation
        }
-       
-       # ... but ensure extinct species stay dead
-       bRates <- lapply(bRates, function(X, ext) ifelse(ext, 0, X), ext=lineages$extinct)
-       dRates <- lapply(dRates, function(X, ext) ifelse(ext, 0, X), ext=lineages$extinct)
-       
+              
 
        # turn rates into waiting times...
        bWait <- lapply(bRates, waitTime)
@@ -348,8 +354,34 @@ growTree <- function(b=1,d=0,halt=20, grain=0.1, linObj=NULL,
 	if(dtFlag) RET <- c(RET, list(dt.rates=dt.rates))
     class(RET) <- "growTree"
     
+    # if the user wants to allow clade growth to continue for a further proportion (p)
+    # of the waiting time to the next clade. Generate a waiting time (W) and then run again with
+    # speciation set to zero, allowing the tree to grow to the current clade age + W*p, 
+    # with the same extinction and character change rules
+
+    if(extend.proportion > 0){
+        
+
+        
+        # generate a waiting time
+        bRates <- ratesCheck(b, lineages)
+        bWait <- lapply(bRates, waitTime)
+        timeToStop <- clade$clade.age + min(unlist(bWait)) * extend.proportion
+        haltExpr <- as.expression(substitute(clade.age >= XXX, list(XXX= timeToStop)))
+        
+        RET <- growTree(b=0, d=d, halt= haltExpr, grain=grain, linObj=RET,
+                     ct.start=ct.start, ct.change=ct.change, ct.var=ct.var, dt.rates=dt.rates,
+                     inheritance=NULL, trace=FALSE, output.phylo=FALSE, 
+                     neg.rates=neg.rates, inf.rates=inf.rates, stall.time=stall.time, extend.proportion=0)
+
+        
+        
+    }
+    
+    
 	if(output.phylo) RET <- linToApe(RET)
 
 	return(RET)
-
 }
+
+

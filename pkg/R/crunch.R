@@ -206,9 +206,7 @@ function(formula, data, phy, names.col, stand.contr = TRUE, ref.var=NULL, node.d
                  
         # save for the user
         ContrObj$validNodes <- validNodes
-        
-        browser()
-        
+                
         # feed the contr.model.response and contr.model.matrix
         # into lm.fit to get the model and then set up the lm object
         # - need to use lm.fit here rather than calling the model on 
