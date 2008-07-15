@@ -206,15 +206,15 @@ growTree <- function(b=1,d=0,halt=20, grain=0.1, linObj=NULL,
         
         # check to see if the stall criteria are met...
         if(all(allRates == 0)){
-            if(grain==Inf) {
-                warning("All rates are zero and grain is set to infinity giving no finite waiting times: exiting stalled simulation")
-                status <- "stalled"
-                break
-            }
             if((clade$clade.age - lastRealEvent) > stall.time ){
                 status <- "stalled"
                 warning("Rates are all zero and stall.time is exceeded: exiting stalled simulation")
                 break # so end the simulation
+            } 
+            if(grain==Inf) {
+                warning("All rates are zero and grain is set to infinity giving no finite waiting times: exiting stalled simulation")
+                status <- "stalled"
+                break
             }
         }
         
@@ -370,9 +370,9 @@ growTree <- function(b=1,d=0,halt=20, grain=0.1, linObj=NULL,
         haltExpr <- as.expression(substitute(clade.age >= XXX, list(XXX= timeToStop)))
        
 	# grow the tree a bit more with no births, but the other processess running as usual
-	# but set the stall time to equal to timeToStop + 1 to avoid the simulation stalling
-	# on infinite waiting times 
-        RET <- growTree(b=0, d=d, halt= haltExpr, grain=timeToStop + 1, linObj=RET,
+	# but set the grain to a non infinite value to avoid stalls on infinite waiting times 
+	# - TODO: this grain choice is arbitrary 
+        RET <- growTree(b=0, d=d, halt= haltExpr, grain=if(! is.finite(grain) ) 0.001 else grain, linObj=RET,
                      ct.start=ct.start, ct.change=ct.change, ct.var=ct.var, dt.rates=dt.rates,
                      inheritance=NULL, trace=FALSE, output.phylo=FALSE, 
                      neg.rates=neg.rates, inf.rates=inf.rates, stall.time=stall.time, extend.proportion=0)
