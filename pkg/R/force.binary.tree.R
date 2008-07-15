@@ -56,7 +56,7 @@ if(is.binary.tree(phylo)){
             splitNode <- split(phylo$node.label,nodeGrp)
             splitNode[[2]] <- newNodeLab
             phylo$node.label <- unlist(splitNode)
-            
+            names(phylo$node.label) <- NULL # remove names - simply internal coding 
         }
         ## and add the new branch lengths and Nnodes
         phylo$edge.length <- c(phylo$edge.length, rep(arb.branch, nPol-2))

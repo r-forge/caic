@@ -368,8 +368,11 @@ growTree <- function(b=1,d=0,halt=20, grain=0.1, linObj=NULL,
         bWait <- lapply(bRates, waitTime)
         timeToStop <- clade$clade.age + min(unlist(bWait)) * extend.proportion
         haltExpr <- as.expression(substitute(clade.age >= XXX, list(XXX= timeToStop)))
-        
-        RET <- growTree(b=0, d=d, halt= haltExpr, grain=grain, linObj=RET,
+       
+	# grow the tree a bit more with no births, but the other processess running as usual
+	# but set the stall time to equal to timeToStop + 1 to avoid the simulation stalling
+	# on infinite waiting times 
+        RET <- growTree(b=0, d=d, halt= haltExpr, grain=timeToStop + 1, linObj=RET,
                      ct.start=ct.start, ct.change=ct.change, ct.var=ct.var, dt.rates=dt.rates,
                      inheritance=NULL, trace=FALSE, output.phylo=FALSE, 
                      neg.rates=neg.rates, inf.rates=inf.rates, stall.time=stall.time, extend.proportion=0)
