@@ -22,19 +22,19 @@ linToApe <- function(linObj){
         ord <- order(linNoR$caic.code)
         edge <- edge[ord,]
         edge.length <- linNoR$lin.age[ord]
-    
+        
         phy <- list(edge=edge, edge.length=edge.length, tip.label=1:clade$nTip, 
                     Nnode=with(clade, nLin-nTip), root.edge=lineages$lin.age[1])              
         class(phy) <- "phylo"
-
-        if(! is.null(linObj$ct.set)){
-            phy$ct.data <- subset(linNoR, select=c("node", names(linObj$ct.set$ct.start)))[ord,]
-            phy$ct.set <- linObj$ct.set
+        
+        lastRules <- linObj$epochRules[[length(linObj$epochRules)]]
+        
+        if(! is.null(lastRules$ct.set)){
+            phy$ct.data <- subset(linNoR, select=c("node", names(lastRules$ct.set$ct.start)))[ord,]
         }
         
-        if(! is.null(linObj$dt.rates)){
-            phy$dt.data <- subset(linNoR, select=c("node", names(linObj$dt.rates)))[ord,]
-            phy$dt.rates <- linObj$dt.rates
+        if(! is.null(lastRules$dt.rates)){
+            phy$dt.data <- subset(linNoR, select=c("node", names(lastRules$dt.rates)))[ord,]
         }
 
     } else {
@@ -51,7 +51,7 @@ linToApe <- function(linObj){
         }
    }
      
-    phy$rules <- linObj$rules
+    phy$epochRules <- linObj$epochRules
     
     return(phy)
 }
