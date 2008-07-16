@@ -321,8 +321,6 @@ growTree <- function(b=1,d=0,halt=20, grain=0.1, linObj=NULL,
        clade$clade.age <- clade$clade.age + winnerWait
        lineages$lin.age[! lineages$extinct] <- lineages$lin.age[! lineages$extinct] + winnerWait
 
-       if(length(epochRules) > 0) browser()
-
        ## trait changes?
        if(ctFlag){
            ## need some code in here
