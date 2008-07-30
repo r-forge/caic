@@ -6,7 +6,7 @@ Many phylogenies contain polytomies, but many functions require bifurcating tree
 function replaces each polytomy by an arbitrary series of bifurcations separated by edges 
 of length \code{arb.branch} (zero by default).}
 \usage{
-force.binary.tree(phylo, arb.branch = 0, node.suffix="_Poly")
+force.binary.tree(phylo, arb.branch = 0, node.suffix="M.MassPoly")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -35,7 +35,9 @@ plot(tmult, show.node.label=TRUE)
 
 # use a non-zero branch length to show resolution of polytomies 
 tforce <- force.binary.tree(tmult, arb.branch=0.1)
-plot(tforce, show.node.label=TRUE)
+
+## TODO - this crashes out with that stupid ape plot bug when running examples.
+## plot(tforce, show.node.label=TRUE)
 
 
 }

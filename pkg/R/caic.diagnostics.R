@@ -46,11 +46,11 @@ caic.diagnostics <- function(caicObj, which.terms=NULL, which.plots=c("NV","SD",
             # plot absolute contrasts against nodal values
             if("NV" %in% which.plots){               
                 eval(substitute(plot(abs(CNT) ~ NV, data=tab, pch=outlier, ylab=ylabExpr, xlab=paste("Nodal values in", var), ...), 
-                     env=list(CNT= as.name(var), NV =as.name(paste("NV_", as.character(var), sep="")))))
+                     env=list(CNT= as.name(var), NV =as.name(paste("NVM.Mass", as.character(var), sep="")))))
                      
                 if(test.signif){
                     NVmod <- eval(substitute(lm(abs(CNT) ~ NV, data=tab), 
-                        env=list(CNT= as.name(var), NV =as.name(paste("NV_", as.character(var), sep="")))))
+                        env=list(CNT= as.name(var), NV =as.name(paste("NVM.Mass", as.character(var), sep="")))))
                         
                     tests[[var]][["NV"]] <- NVmod
                     

@@ -1,5 +1,5 @@
 "force.binary.tree" <-
-function(phylo, arb.branch =0, node.suffix="_Poly"){
+function(phylo, arb.branch =0, node.suffix="M.MassPoly"){
 
 ## Written by David Orme
 ## Takes a polytomous tree and arbitrarily resolves the polytomies

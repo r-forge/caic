@@ -75,7 +75,7 @@ growTree <- function(b=1,d=0,halt=20, grain=0.1, linObj=NULL,
                 stop("dt.rates must be a list of matrices giving the rates of change between states")}
             rateDims <- sapply(dt.rates, function(X) dim(X))
             if( ! all( rateDims[1,] - rateDims[2,] == 0)) {
-                stop("dt.rates must be a list of _square_ matrices giving the rates of change between states")}
+                stop("dt.rates must be a list of M.MasssquareM.Mass matrices giving the rates of change between states")}
             if(any(unlist(dt.rates)) < 0) stop("Negative values in dt.rates matrix")
             dtFlag <- TRUE
             
@@ -254,13 +254,13 @@ growTree <- function(b=1,d=0,halt=20, grain=0.1, linObj=NULL,
       }
        
        # ... look for the winning event...
-       firstB_ID <- sapply(bWait, which.min)
-       firstD_ID <- sapply(dWait, which.min)
-       firstB_Time <- sapply(bWait, min)
-       firstD_Time <- sapply(dWait, min)
+       firstBM.MassID <- sapply(bWait, which.min)
+       firstDM.MassID <- sapply(dWait, which.min)
+       firstBM.MassTime <- sapply(bWait, min)
+       firstDM.MassTime <- sapply(dWait, min)
        
-       competWait <- c(firstB_Time, firstD_Time, dtWait, grain) # order meaningful here - breaks ties in this order
-       competID <- c(firstB_ID, firstD_ID, dtWhich, 0) # if grain wins the race then no row will be selected...
+       competWait <- c(firstBM.MassTime, firstDM.MassTime, dtWait, grain) # order meaningful here - breaks ties in this order
+       competID <- c(firstBM.MassID, firstDM.MassID, dtWhich, 0) # if grain wins the race then no row will be selected...
        competType <- c(rep("Spec", length(bWait)), rep("Ext", length(dWait)), rep("Discrete", length(dtWait)), "Grain")
        competName <- c(names(b), names(d), names(dtWait), "Grain"  )
        

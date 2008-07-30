@@ -86,7 +86,7 @@ function(vals, phy, ref.var){
                     # - ref.var identifies the column
                     rv <- vals[, ref.var]
                     
-                    # can't do anything with _no_ data, but need to do something with
+                    # can't do anything with M.MassnoM.Mass data, but need to do something with
                     # one or more children with information...                     
                     if(any(compChild)){
                         
@@ -154,7 +154,7 @@ function(vals, phy, ref.var){
                     # further exclude any nodes which have been used to calculate contrasts
                     compChild <- compChild & ! brunchUsed[children]
                     
-                    # can't do anything with _no_ data, but need to do something with
+                    # can't do anything with M.MassnoM.Mass data, but need to do something with
                     # one or more children with information...                     
                     if(any(compChild)){
                         
@@ -231,7 +231,7 @@ function(vals, phy, ref.var){
                     # further exclude any nodes which have been used to calculate contrasts
                     compChild <- compChild & ! brunchUsed[children]
                     
-                    # can't do anything with _no_ data, but need to do something with
+                    # can't do anything with M.MassnoM.Mass data, but need to do something with
                     # one or more children with information...                     
                     if(any(compChild)){
                         

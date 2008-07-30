@@ -20,10 +20,7 @@ If the value of \code{at} predates the last speciation in the phylogeny then the
   The function returns \code{phy}, with terminal branch lengths altered so that the tips align at the time provided.
 }
 \author{David Orme}
-\note{ ~~further notes~~ 
 
- ~Make other sections like Warning with \section{Warning }{....} ~
-}
 \examples{
 phy <- rtree(20)
 par(mfrow=c(2,1))

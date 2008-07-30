@@ -1,11 +1,11 @@
 Package: CAIC
 Type: Package
 Title: Comparative Analyses using Independent Contrasts
-Version: 1.0.3
+Version: 1.0.4
 Date: 2008-06-03
-Author: David Orme
+Author: David Orme, Rob Freckleton, Gavin Thomas
 Maintainer: David Orme <d.orme@imperial.ac.uk>
-Depends: R (>= 2.6.0), ape, MASS
+Depends: R (>= 2.6.0), ape, MASS, mvtnorm
 Description: Functions for performing comparative analysis using independent contrasts and tree simulation.
 License: GPL version 2 or newer 
 

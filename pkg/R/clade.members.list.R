@@ -1,6 +1,14 @@
 "all.clades" <-
 function(phy, tips=FALSE, tip.labels=FALSE){
     
+    .Deprecated("clade.members.list")
+    clade.members.list(phy, tips=FALSE, tip.labels=FALSE)
+}
+
+
+"clade.members.list" <-
+function(phy, tips=FALSE, tip.labels=FALSE){
+    
     # OLD2NEW CONVERTED
     
 	# returns a list of vectors showing the tips

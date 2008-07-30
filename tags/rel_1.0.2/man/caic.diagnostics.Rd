@@ -50,4 +50,4 @@ print(modDiag)
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ hplot }
-\keyword{ models }% __ONLY ONE__ keyword per line
+\keyword{ models }% M.MassM.MassONLY ONEM.MassM.Mass keyword per line

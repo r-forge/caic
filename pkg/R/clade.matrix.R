@@ -22,7 +22,7 @@ function(phy){
 	diag(clade.mat) <- 1
 	
 	# now deal with internals
-	node.members <- all.clades(phy)
+	node.members <- clade.members.list(phy)
 
 	node.id <- names(node.members)
 	for(rows in seq(along=node.id)){

@@ -5,7 +5,7 @@ function(formula, data, phy, names.col, stand.contr = TRUE, ref.var=NULL, node.d
 
         # OLD2NEW STATUS: Converted to use new ape phylo structure
         # All geographic based contrast calculation code has been removed in order to hasten a first release of the package
-        # and the caic wrapper function to contrCalc has been split to explicit caic and macrocaic wrappers 
+        # and the caic wrapper function to contrCalc has been split to explicit caic and macrocaic wrappers and thence caic to brunch and crunch
         
         # Program Flow:
         #   1) setup - check arguments, 
@@ -163,7 +163,7 @@ function(formula, data, phy, names.col, stand.contr = TRUE, ref.var=NULL, node.d
 
     # NOW SETUP TO GET CONTRASTS AND NODAL VALUES
         # We know the tip values, the analysis tree         
-        contr <- contrCalc(md, analysisPhy, ref.var, "brunch", crunch.brlen)
+        contr <- contrCalc(md, analysisPhy, ref.var, "brunch", 0) # brunch used an internal branch length of 0
 
     # GET RESPONSE MATRIX
         # first column of contrasts is response

@@ -119,12 +119,12 @@ Depending on the value of \code{output.phylo}, either an object of class 'phylo'
                         ncol=4, dimnames=list(c("AB", "A", "B", "0"), c("AB", "A", "B", "0"))))
 
     # probability of speciating in each region
-    spec <- list(regA_spec = expression(ifelse(region == "AB" | region == "A", 1, 0)),
-                 regB_spec = expression(ifelse(region == "AB" | region == "B", 0.5, 0)))
+    spec <- list(regAM.Massspec = expression(ifelse(region == "AB" | region == "A", 1, 0)),
+                 regBM.Massspec = expression(ifelse(region == "AB" | region == "B", 0.5, 0)))
 
     # inheritance rules - see which region speciated and one of the daughters inherits only that region
-    inherit <- list(region = expression(if(winnerName=="regB_spec" && region[1] == "AB") c("AB","A") else region),
-                    region = expression(if(winnerName=="regA_spec" && region[1] == "AB") c("AB","B") else region))
+    inherit <- list(region = expression(if(winnerName=="regBM.Massspec" && region[1] == "AB") c("AB","A") else region),
+                    region = expression(if(winnerName=="regAM.Massspec" && region[1] == "AB") c("AB","B") else region))
 
     # extinction rule - need to enforce extinction when the species is in neither region.
     extinct <- expression(ifelse(region == "0", Inf, 0))

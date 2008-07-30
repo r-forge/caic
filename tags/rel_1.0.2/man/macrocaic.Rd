@@ -56,4 +56,4 @@ caicMod <- macrocaic(nSpp ~ weight, phy=diTree, data=SmallTreeDat, names.col=tip
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{models}
-\keyword{regression}% __ONLY ONE__ keyword per line
+\keyword{regression}% M.MassM.MassONLY ONEM.MassM.Mass keyword per line
