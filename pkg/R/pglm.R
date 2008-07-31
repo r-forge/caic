@@ -706,13 +706,13 @@ order.D <- function(data) {
         if(! is.numeric(data)) stop("x must be a numeric vector")
 	    if(is.null(names(data))) stop("Need to supply names for the data vector")
 	    
-        dat <- dat[order(names(data))]
+        data <- data[order(names(data))]
         
     } else if(is.data.frame(data)) {
         
 	    if(is.null(row.names(data))) stop("Need to supply row names for the data frame")
 
-    	dat <- dat[order(row.names(data)),]
+    	data <- data[order(row.names(data)),]
 	} else {
 	    stop("Data not a named vector or data frame.")
 	}
