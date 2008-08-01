@@ -33,4 +33,4 @@ apply(tree.VCVA ^ 0.5, c(1,2), sum, na.rm=TRUE)
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ manip }
-\keyword{ utilities }% M.MassM.MassONLY ONEM.MassM.Mass keyword per line
+\keyword{ utilities }% __ONLY ONE__ keyword per line

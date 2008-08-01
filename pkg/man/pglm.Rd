@@ -92,10 +92,11 @@ Returns an object of class \code{pglm} containing the following:
 data(shorebird)
 shorebird.VCV <- vcv.phylo(shorebird.tree)
 
-shorebird.mod <- 
-
+shorebird.modL1 <- pglm(Cl.size ~ M.Mass, data=shorebird.data, ph=shorebird.VCV, lambda=1)
+shorebird.modL0 <- pglm(Cl.size ~ M.Mass, data=shorebird.data, ph=shorebird.VCV, lambda=0)
+shorebird.mod <- pglmEstLambda(Cl.size ~ M.Mass, data=shorebird.data, ph=shorebird.VCV)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ models }
-\keyword{ regression }% M.MassM.MassONLY ONEM.MassM.Mass keyword per line
+\keyword{ regression }% __ONLY ONE__ keyword per line

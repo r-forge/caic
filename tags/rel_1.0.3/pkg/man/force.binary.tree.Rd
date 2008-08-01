@@ -6,7 +6,7 @@ Many phylogenies contain polytomies, but many functions require bifurcating tree
 function replaces each polytomy by an arbitrary series of bifurcations separated by edges 
 of length \code{arb.branch} (zero by default).}
 \usage{
-force.binary.tree(phylo, arb.branch = 0, node.suffix="M.MassPoly")
+force.binary.tree(phylo, arb.branch = 0, node.suffix="_Poly")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

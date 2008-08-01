@@ -16,7 +16,7 @@ The clade matrix shows the tips from a phylogeny that subtend from each internal
 }
 \value{
   A list of class 'clade.matrix' containing the following components:
-  \item{clade.matrix}{A binary m x n matrix, where m is the total number of nodes in the phylogeny and n is the number of tips. An element is 1 if tip $nM.Massi$ subtends from a node $mM.Massj$.}
+  \item{clade.matrix}{A binary m x n matrix, where m is the total number of nodes in the phylogeny and n is the number of tips. An element is 1 if tip $n_i$ subtends from a node $m_j$.}
   \item{edge.length}{A numeric vector of length m showing the edge length leading to each node in the phylogeny and named with the node number.}
   \item{tip.label}{A character vector of length n giving the labels assigned to the tips of the phylogeny.}
 }

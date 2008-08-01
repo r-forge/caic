@@ -73,7 +73,7 @@ lik.lambda <- function(x, V, data=NULL, lambda) {
 	}
     
     # handle the possibility of a VCV array
-    if(inherits(V, 'phylo.array')) V <- apply(V, c(1,2), FUN=sum, na.rm=TRUE) # reduces the array to a standard VCV
+    if(inherits(V, 'vcv.array')) V <- apply(V, c(1,2), FUN=sum, na.rm=TRUE) # reduces the array to a standard VCV
 
 	V <- order.V(V)
 	
@@ -141,7 +141,7 @@ lik.kappa <- function(x, V.arr, data=NULL, kappa) {
 	}
 
     # needs an array form of the VCV
-    if(! inherits(V.arr, 'phylo.array')) stop("Kappa transformations require an array form of the VCV matrix storing indvidual branch lengths")
+    if(! inherits(V.arr, 'vcv.array')) stop("Kappa transformations require an array form of the VCV matrix storing indvidual branch lengths")
 	V.arr <- order.V(V.arr)
 	
     if(! all(names(x) == rownames(V.arr))) stop("Taxon names do not match between the sorted data and the sorted V matrix.")
@@ -157,7 +157,7 @@ lik.kappa <- function(x, V.arr, data=NULL, kappa) {
 	kappaTrans <- function(V.arr, kappa) {
 	    
 	    ## In  a move I find surprising, NA^0 = 1, so need to catch that case
-	    if(kappa == 0) V.arr <- V.arr > 0 else V.arr <-  V.arr ^ kappa
+	    if(kappa == 0) V.arr <- (V.arr > 0) else V.arr <-  V.arr ^ kappa # V.arr becomes logical in the case kappa = 0 but sum handles that in the next lin
 		V <- apply(V.arr, c(1,2), FUN=sum, na.rm=TRUE) # reduces the array to a standard VCV
 		return(V)
 	}
@@ -266,7 +266,7 @@ lam.test.single <- function(x, data, V, pretty=TRUE) {
 	p0 <- 1 - pchisq(lrt0, 1)
 	p1 <- 1 - pchisq(lrt1, 1)
 	
-	cat("M.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.Mass\n")
+	cat("____________________________\n")
 	cat("\n")
 	cat("ML estimate of lambda: ", ml.lam$minimum, "\n")
 	cat("Maximised log-likelihood: ", -ml.lam$objective, "\n")
@@ -276,7 +276,7 @@ lam.test.single <- function(x, data, V, pretty=TRUE) {
 	cat("\n")
 	cat("Likelihood at lamdba = 1: ", lam1$ll, "\n")
 	cat("Test of Lambda = 1: chisq = ", lrt1, " P = ", p1, "\n")
-	cat("M.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.MassM.Mass\n")
+	cat("____________________________\n")
 }
 
 

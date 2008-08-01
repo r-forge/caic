@@ -33,4 +33,4 @@ clade.members(22, diTree, tip.labels=TRUE)
 clade.members.list(diTree, tip.labels=FALSE)
 }
 \keyword{ manip }% at least one, from doc/KEYWORDS
-\keyword{ utilities}% M.MassM.MassONLY ONEM.MassM.Mass keyword per line
+\keyword{ utilities}% __ONLY ONE__ keyword per line

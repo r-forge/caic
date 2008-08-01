@@ -5,10 +5,10 @@ function(caicObj, validNodes=TRUE, nodalValues=FALSE, ultrametric.tol=0.0001){
         nodeNum <- matrix(as.numeric(names(caicObj$contrast.data$contrVar)),
                           ncol=1, dimnames=list(NULL, "nodeNumber"))
         contr <- with(caicObj$contrast.data$contr, cbind(response, explanatory))
-        # colnames(contr) <- paste("CM.Mass", colnames(contr), sep="")
+        # colnames(contr) <- paste("C_", colnames(contr), sep="")
         if(nodalValues){
             nv <- with(caicObj$contrast.data$nodalVals, cbind(response, explanatory))
-            colnames(nv) <- paste("NVM.Mass", colnames(nv), sep="")
+            colnames(nv) <- paste("NV_", colnames(nv), sep="")
             tab <- as.data.frame(cbind(nodeNum, contr, nv))
         } else {
             tab <- as.data.frame(cbind(nodeNum, contr))

@@ -67,17 +67,16 @@ The \code{maxLik} functions return \code{optimize} output: namely, a list with c
 \examples{
 
 data(shorebird)
-shorebird.VCV <- vcv.phylo(shorebird.tree)
-shorebird.VCVA <- vcv.phylo.array(shorebird.tree)
+shorebird.VCV <- vcv.array(shorebird.tree, dim=3)
 
 lik.lambda("M.Mass", shorebird.VCV, shorebird.data, 0.3)
 M.Mass.lamSurf <- profileLik.lambda("M.Mass", shorebird.VCV, shorebird.data)
 M.Mass.lamML <- maxLik.lambda("M.Mass", shorebird.VCV, shorebird.data)
 abline(v=M.Mass.lamML)
 
-lik.kappa("M.Mass", shorebird.VCVA, shorebird.data, 0.3)
-M.Mass.kapSurf <- profileLik.kappa("M.Mass", shorebird.VCVA, shorebird.data)
-M.Mass.kapML <- maxLik.kappa("M.Mass", shorebird.VCVA, shorebird.data)
+lik.kappa("M.Mass", shorebird.VCV, shorebird.data, 0.3)
+M.Mass.kapSurf <- profileLik.kappa("M.Mass", shorebird.VCV, shorebird.data)
+M.Mass.kapML <- maxLik.kappa("M.Mass", shorebird.VCV, shorebird.data)
 abline(v=M.Mass.kapML)
 
 }
