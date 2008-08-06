@@ -6,7 +6,7 @@
 A CAIC object contains a relatively complex list containing the contrasts, phylogeny and linear model. This function extracts the contrast values to a data frame, optionally including information on all nodes in the phylogeny, not just those for which valid contrasts can be calculated. There is also an option to include nodal values for the internal nodes in the data frame. The table also includes studentized residuals from the linear model and calculated node ages, variances, number of descendent lineages and node depths.
 }
 \usage{
-caic.table(caicObj, validNodes = TRUE, nodalValues=FALSE, ultrametric.tol=0.0001)
+caic.table(caicObj, validNodes = TRUE, nodalValues=FALSE, ultrametric.tol=0.0001, CAIC.codes=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -14,7 +14,7 @@ caic.table(caicObj, validNodes = TRUE, nodalValues=FALSE, ultrametric.tol=0.0001
   \item{validNodes}{ }
   \item{nodalValues}{ ~~Describe \code{validNodes} here~~ }
   \item{ultrametric.tol}{Passed to is.ultrametric to determine the tolerance for detecting whether the analysis tree is ultrametric.}
-
+  \item{CAIC.codes}{A logical indicating whether or not to include a column of CAIC codes for each internal node.}
 }
 \details{
 The function is also called internally by caic and macrocaic to provide a model frame for the 'lm' object. 
