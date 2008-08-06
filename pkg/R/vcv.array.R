@@ -21,6 +21,7 @@ vcv.array <- function(phy, dim=2, compact=TRUE){
     
     if(dim == 2){
         V <- crossprod(cmM, cmEM)
+        dimnames(V) <- list(phy$tip.label, phy$tip.label)
     } else {
         if(compact){
             

@@ -23,7 +23,7 @@ fusco.markovNullTree(nTips, nSpecies)
 fusco.randomise(object,  rand.reps=1000, rand.CI = 0.95)
 \method{print}{fusco}(x, ...)
 \method{summary}{fusco}(object, ...)
-\method{plot}{fusco}(x, correction=TRUE, nBins=10, right=FALSE, I.prime=TRUE, ...)}
+\method{plot}{fusco}(x, correction=TRUE, nBins=10, right=FALSE, I.prime=TRUE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
