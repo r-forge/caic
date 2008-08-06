@@ -26,11 +26,10 @@ function(caicObj, validNodes=TRUE, nodalValues=FALSE, ultrametric.tol=0.0001, CA
        
        if(CAIC.codes){
            Cphy <- caic.label(caicObj$phy)
-           
-           
+           tab$CAIC.code <- Cphy$edge.caic.code[match(tab$nodeNumber, names(Cphy$edge.caic.code))]
        }
        
-        return(tab)
+       return(tab)
 
 }
 
