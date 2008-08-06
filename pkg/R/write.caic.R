@@ -33,7 +33,8 @@ function(phy, filebase, equal.brlen=NULL, charset=LETTERS){
     phyl <- subset(treeStruct, ! is.na(treeStruct$tip.label))
     phyl <- phyl[order(phyl[,2]), 2:1]
 
-    cat(t(phyl), file=paste(filebase, ".phyl", sep=""), sep="\n")
+    phyl <- with(phyl, paste(code, tip.label, sep="\n"))
+    cat(phyl, file=paste(filebase, ".phyl", sep=""), sep="\n")
     
     invisible(NULL)
 }
