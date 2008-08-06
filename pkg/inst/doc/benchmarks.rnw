@@ -1,0 +1,117 @@
+% -*- mode: noweb; noweb-default-code-mode: R-mode; -*-
+\documentclass[a4paper]{article}
+
+\usepackage{geometry}
+\setcounter{secnumdepth}{0}
+\setlength{\parskip}{9pt}
+\geometry{a4paper, textwidth=15cm, textheight=25cm}
+
+% \VignetteIndexEntry{An R Package for comparative analysis by independent contrasts} 
+% \VignetteDepends{ape} 
+% \VignetteKeyword{stats} 
+% \VignetteKeyword{kwd2} 
+
+\title{The CAIC package: methods benchmarks.}
+\author{David Orme}
+
+\SweaveOpts{echo=TRUE}
+\begin{document}
+
+\maketitle
+
+This file contains details on the benchmark testing of the implementation of various methods in the package against other existing implementations.
+<<echo=FALSE>>=
+options(width=80)
+@
+\section{Datasets}
+
+The main benchmark dataset is  a 200 tip tree grown under a pure-birth, constant-rates model using the \texttt{growTree()} function. Three co-varying continuous variables and a two and a three level categorical variable were evolved on the tree. The details of the code are presented in the file  `BenchmarkDataCreator.R', which details the covariation between the continuous traits and the transition rate matrix for the categorical variables. An extra variable also tests the special case of having no variation in the reference variable at a polytomy. The simulated dichotomous tree has also been degraded to contain a few polytomies. The creator file also handles exporting the data and tree into a form suitable for use in CAIC.
+
+
+
+\section{Benchmarking against CAIC.}
+
+\subsection{The \texttt{crunch} algorithm}
+
+These tests compare the output of the \texttt{crunch()} function against that of CAIC v2.6.9, running in Mac OS 9.2.2 emulation under Mac OS 10.4.10.
+
+\subsubsection{Bench.Di.Cr.123: three continuous variables on a dichotomous tree}
+
+The analysis was run in CAIC, giving the following log file:
+
+\small{\begin{verbatim}
++ CAIC v2.6.9 started.
++ Input: "What is the name of your data set? [1-15 letters]" : BenchCAIC.dat
++ Input: "Are clade names in 1 or 2 columns? [1-2]" : 1
++ Input: "How many columns of data are there in BenchCAIC.dat? [1-128]" : 6
++ Input: "How many of the columns hold categorical data? [0-5]" : 2
++ Input: "Does the file contain column names? [y/n]" : y
++ Input: "What is the phylogeny called? [1-28 letters]" : BenchTreeDi
++ Input: "Is there a .Blen file (type "n" for equal lengths)? [y/n]" : y
++ Progress:      200 clades were written to Intermediate.Int ...
+
++ Progress: 200 records have been written to BenchCAIC.dat.Load ...
+
++ Input: "Number of first column to be included? [1-6]" : 1
++ Input: "Number of next column (0 to stop)? [0-6]" : 2
++ Input: "Number of next column (0 to stop)? [0-6]" : 3
++ Input: "Number of next column (0 to stop)? [0-6]" : 0
++ Input: "Is this correct? [y/n]" : y
++ Input: "Which is the main predictor (independent) column? [1-6]" : 2
++ Input: "What identifier do you want to give this analysis? [4-15 letters]" : Di_Cr_123
++ Progress: 200 clades to be used ...
++ Input: "Crunch or Brunch data? [c/b]" : c
++ Progress:      199 sets of contrasts written to BenchCAIC.dat_Di_Cr_123 ...
+
++ Input: "Select more columns or quit? [s/q]" : q
+\end{verbatim}}
+
+The following code loads the output of the CAIC analysis into R. This data frame now contains the standard CAIC contrast table consisting of: the CAIC code for the node, the contrast in each variable, the standard deviation of the contrast, the height of the node, the number of subtaxa descending from the node; and the nodal values of the variables.
+
+<<>>=
+CAIC.Di.Cr.123 <- read.delim("../../benchmarks/CAIC_crunch_outputs/Bench_Di_Cr_123.txt")
+str(CAIC.Di.Cr.123)
+@
+
+The next section of code duplicates the CAIC analysis using the \texttt{crunch()} function. The contrast plots from the CAIC data are then overplotted with the results from the \texttt{crunch()} analysis in Fig. \ref{Di.Cr.123.overplot}.
+
+<<>>=
+load("../../benchmarks/CAIC_benchmark.rda")
+crunch.Di.Cr.123 <- crunch(contResp ~ contExp1 + contExp2, data=BenchData, phy=BENCH, names.col=node)
+crunch.Di.Cr.123.tab <- caic.table(crunch.Di.Cr.123, CAIC.codes=TRUE)
+par(mfrow=c(1,2), mar=c(4,4,1,1))
+plot(contResp~contExp1, data=CAIC.Di.Cr.123)
+with(crunch.Di.Cr.123.tab, 
+     points(x=contExp1, y=contResp, col="red", pch=20, cex=0.5))
+plot(contResp~contExp2, data=CAIC.Di.Cr.123)
+with(crunch.Di.Cr.123.tab, 
+     points(x=contExp2, y=contResp, col="red", pch=20, cex=0.5))
+@
+
+\begin{figure}[htbp]
+  \begin{center}
+<<echo=FALSE, fig=true, width=8, height=4>>=
+par(mfrow=c(1,2), mar=c(4,4,1,1))
+plot(contResp~contExp1, data=CAIC.Di.Cr.123)
+with(crunch.Di.Cr.123.tab, 
+     points(x=contExp1, y=contResp, col="red", pch=20, cex=0.5))
+plot(contResp~contExp2, data=CAIC.Di.Cr.123)
+with(crunch.Di.Cr.123.tab, 
+     points(x=contExp2, y=contResp, col="red", pch=20, cex=0.5))
+@
+    \caption{Di.Cr.123: Overplotting of results from CAIC (black) and \texttt{crunch()} (red) analyses.}
+    \label{Di.Cr.123.overplot}
+  \end{center}
+\end{figure}
+
+The final check is to sort the two data frames into the same order and compare the values of the three sets of contrasts. The maximum differences are around $\pm1e-5$ and this arises from the limited precision of the values saved in the CAIC output.
+<<>>=
+crunch.Di.Cr.123.tab <- crunch.Di.Cr.123.tab[order(crunch.Di.Cr.123.tab$CAIC.code),]
+CAIC.Di.Cr.123 <- CAIC.Di.Cr.123[order(CAIC.Di.Cr.123$Code),]
+
+summary(CAIC.Di.Cr.123$contResp - crunch.Di.Cr.123.tab$contResp)
+summary(CAIC.Di.Cr.123$contExp1 - crunch.Di.Cr.123.tab$contExp1)
+summary(CAIC.Di.Cr.123$contExp2 - crunch.Di.Cr.123.tab$contExp2)
+@
+
+\end{document}
