@@ -19,7 +19,7 @@ function(phy, filebase, equal.brlen=NULL, charset=LETTERS){
     
      # create a data.frame of CAIC codes, branch lengths and tip.labels including the root edge
     treeStruct <- data.frame( tip.label = I(c(NA, with(phy, tip.label[match(edge[,2], seq(along=tip.label))]))),
-                              code = I(c("", phy$edge.caic.code)),
+                              code = I(c("", with(phy, edge.caic.code[match(edge[,2], names(edge.caic.code))]))),
                               brlen = brlen,
                               node.depth = -9)
     
