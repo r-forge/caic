@@ -288,6 +288,7 @@ growTree <- function(b=1,d=0,halt=20, grain=0.1, linObj=NULL,
            for(dt in names(dt.rates)){
                
                currDtRate <- dt.rates[[dt]][,lineages[,dt], drop=FALSE]
+               colnames(currDtRate) <- lineages$id
                currDtRate[,lineages$extinct] <- 0
                currDtWait <- waitTime(currDtRate)
                dtWait[dt]  <- min(currDtWait)
