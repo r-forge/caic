@@ -19,6 +19,10 @@ growTree <- function(b=1,d=0,halt=20, grain=0.1, linObj=NULL,
         wait <- rexp(length(rates), rates)
         wait[zero] <- Inf
         wait[inf] <- 0
+        
+        # handle matrix of rates, such as the discrete trait rates uses...
+        if(is.matrix(rates)) wait <- array(wait, dim=dim(rates), dimnames=dimnames(rates))
+        
         return(wait)
     }
 	
@@ -276,15 +280,16 @@ growTree <- function(b=1,d=0,halt=20, grain=0.1, linObj=NULL,
        if(dtFlag){
            ## for each trait, take the relevant column in lineages and
            ## use it to sample columns from the appropriate rate matrix
-           dtWait <- numeric(length(dt.rates))
-           names(dtWait) <- names(dt.rates)
-           dtWhich <- rbind(lineage=dtWait, state=dtWait)
+
+           dtWait <- numeric(length(dt.rates)) # vector to hold fastest time to change
+           names(dtWait) <- names(dt.rates) 
+           dtWhich <- rbind(changeToState=dtWait, lineage=dtWait) # matrix to hold which lineage is to change to what state for those fastest events
            
            for(dt in names(dt.rates)){
                
                currDtRate <- dt.rates[[dt]][,lineages[,dt], drop=FALSE]
                currDtRate[,lineages$extinct] <- 0
-               currDtWait <- as.matrix(apply(currDtRate,1, waitTime)) # because apply drops dimensions on the root
+               currDtWait <- waitTime(currDtRate)
                dtWait[dt]  <- min(currDtWait)
                dtWhich[,dt] <- which(currDtWait == dtWait[dt], arr.ind=TRUE)[1,] 
                ## TODO - think about that [1,] - removes ties but these are always likely to be between Inf so this is reasonable
@@ -364,6 +369,8 @@ growTree <- function(b=1,d=0,halt=20, grain=0.1, linObj=NULL,
            clade$nExtantTip <- clade$nExtantTip+1
            ## record that something happened here
            lastRealEvent <- clade$clade.age
+          if(trace) cat(clade$clade.age, ": Lineage ", winnerID, " speciated\n")
+
         }
         
         if(winnerType == "Ext"){ #an extinction
@@ -375,19 +382,23 @@ growTree <- function(b=1,d=0,halt=20, grain=0.1, linObj=NULL,
            clade$nExtinctTip <- clade$nExtinctTip+1
            ## record that something happened here
            lastRealEvent <- clade$clade.age
+           if(trace) cat(clade$clade.age, ": Lineage ", winnerID, " went extinct\n")
         }
         
         if(winnerType == "Discrete"){ # a discrete trait changes
 
             lin <- dtWhich["lineage", winnerName]
-            state <- dtWhich["state", winnerName]
-            lineages[lin, winnerName] <- dimnames(dt.rates[[winnerName]])[[1]][state]
+            state <- dtWhich["changeToState", winnerName] # as a number
+            state <- dimnames(dt.rates[[winnerName]])[[1]][state] # as the state name
+            lineages[lin, winnerName] <- state
             lastRealEvent <- clade$clade.age
+            if(trace) cat(clade$clade.age, ": Discrete trait ", winnerName, " on lineage", lin, " changed to state ", state, "\n")
+
         }
-    
+
     }
 
-    if(trace) cat("Simulation halted at T=", clade$clade.age, "by halt rule '", names(halt)[haltStatus], "'\n")
+    if(trace) cat(clade$clade.age, ":Simulation halted by halt rule '", names(halt)[haltStatus], "'\n")
     
     ## create a lineage structure
 	RET <- list(lineages=lineages, clade=clade, status=status)
@@ -406,6 +417,7 @@ growTree <- function(b=1,d=0,halt=20, grain=0.1, linObj=NULL,
     ## with the same extinction and character change rules
     ## TODO? - build this into a helper function extendTree() rather than doing it internally...
     if(extend.proportion > 0){
+        if(trace) cat(clade$clade.age, ": Simulation extended beyond last speciation.\n")
         
         ## generate a waiting time
         bRates <- ratesCheck(b, lineages, inf.rates, neg.rates)
@@ -419,7 +431,7 @@ growTree <- function(b=1,d=0,halt=20, grain=0.1, linObj=NULL,
     	## - note that the trait evolution information is carried over via the epoch rules recording
         RET <- growTree(b=0, d=d, halt= haltExpr, grain=if(! is.finite(grain) ) 0.001 else grain, linObj=RET,
                      ct.start=NULL, ct.change=NULL, ct.var=NULL, dt.rates=NULL,
-                     inheritance=NULL, trace=FALSE, output.phylo=FALSE, 
+                     inheritance=NULL, trace=trace, output.phylo=FALSE, 
                      neg.rates=neg.rates, inf.rates=inf.rates, stall.time=stall.time, extend.proportion=0)
         
     }
