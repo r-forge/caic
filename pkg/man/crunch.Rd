@@ -33,9 +33,12 @@ The resulting table of contrasts is then used to fit the specified model - note 
 
 Missing data notes here...
 
-Polytomies - more detail here The Mac Classic program CAIC used 1 for both 'Brunch' and 'Crunch' analyses and this the default.
+Contrasts at polytomies are calculated following Pagel (1992). The descendants from the node are split into two groups based on whether they are above or below the group mean in the reference variable. If there is no variation in the reference variable, then a 1:(N-1) split is used. Weighted means in the variables are then calculated for each subgroup and a contrast is calculated between these values using an arbitrary internal branch length. The program CAIC used an internal branch length of 1 for both 'Brunch' and 'Crunch' for calculating contrasts at a polytomy  and this is the default here.
 
+}
 
+\section{Warning}{
+At a polytomy, subtracting the internal branch length from the real branch lengths can lead to negative branch lengths. In this case, CAIC v2.6.9 issued a warning but allowed contrast calculation to continue. The implementation in \code{crunch()} does not permit this and so the two implementations differ in this respect. In either case, contrast calculation on negative branch lengths is not a desirable outcome. Although the error can be avoided by either rescaling the branch lengths or reducing the internal branch length via \code{polytomy.brlen}, this will alter the values of contrasts calculated at polytomies. The method used by \code {pic.lm} at polytomies avoids this problem.
 }
 \value{
   A list of class 'caic' containing the following:
