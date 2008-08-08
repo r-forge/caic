@@ -26,7 +26,7 @@ function(dataf, phyl, fun, ..., tips=FALSE){
 
 		# ugly line that computes 'fun' for each numeric column in each subset of tips defined by internal nodes
 		cstats <- t(sapply(clades, function(x){apply(dataf[match(x, dataf.names),,drop=FALSE], 2, fun, ...)}, simplify=TRUE))
-		return(cstats)
+		return(as.data.frame(cstats))
 	}
 	
 }
