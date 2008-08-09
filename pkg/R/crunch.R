@@ -1,6 +1,6 @@
 `crunch` <-
 function(formula, data, phy, names.col, stand.contr = TRUE, ref.var=NULL, node.depth=NULL,
-                  polytomy.brlen=1, equal.branch.length=FALSE, factor.action="abort")
+                  polytomy.brlen=0, equal.branch.length=FALSE, factor.action="abort")
 {
 
 
@@ -21,9 +21,9 @@ function(formula, data, phy, names.col, stand.contr = TRUE, ref.var=NULL, node.d
         # TODO - allow caic to be used as a contrast calculator
         # TODO - farm out common data setup in caic and macrocaic to a single function.
         # TODO - more error checking on inputs
-        
-        # TODO - for .Rd: polytomy.brlen = intermediate branch length to use at polytomies - CAIC used 1 but this is not fixed
        
+        # TODO - explicit check for polytomy.brlen problems
+        
         # CHECKS AND SETUP
 
         # record call and dataset names

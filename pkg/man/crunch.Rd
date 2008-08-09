@@ -33,12 +33,11 @@ The resulting table of contrasts is then used to fit the specified model - note 
 
 Missing data notes here...
 
-Contrasts at polytomies are calculated following Pagel (1992). The descendants from the node are split into two groups based on whether they are above or below the group mean in the reference variable. If there is no variation in the reference variable, then a 1:(N-1) split is used. Weighted means in the variables are then calculated for each subgroup and a contrast is calculated between these values using an arbitrary internal branch length. The program CAIC used an internal branch length of 1 for both 'Brunch' and 'Crunch' for calculating contrasts at a polytomy  and this is the default here.
-
+Contrasts at polytomies are calculated following Pagel (1992). The descendants from the node are split into two groups based on whether they are above or below the group mean in the reference variable. If there is no variation in the reference variable, then a 1:(N-1) split is used. Weighted means in the variables are then calculated for each subgroup and a contrast is calculated between these values using an arbitrary internal branch length.
 }
 
 \section{Warning}{
-At a polytomy, subtracting the internal branch length from the real branch lengths can lead to negative branch lengths. In this case, CAIC v2.6.9 issued a warning but allowed contrast calculation to continue. The implementation in \code{crunch()} does not permit this and so the two implementations differ in this respect. In either case, contrast calculation on negative branch lengths is not a desirable outcome. Although the error can be avoided by either rescaling the branch lengths or reducing the internal branch length via \code{polytomy.brlen}, this will alter the values of contrasts calculated at polytomies. The method used by \code {pic.lm} at polytomies avoids this problem.
+At a polytomy, subtracting the internal branch length from the real branch lengths can lead to negative branch lengths. CAIC used a hard-coded internal branch length of 1 for calculating crunch contrasts at polytomies. From version 2.6.9, CAIC issued a warning if this lead to negative branch lengths but allowed contrast calculation to continue. In contrast, the implementation in \code{crunch()} uses a default internal branch length (\code{polytomy.brlen}) of 0 and also treats a negative branch length in a polytomy calculation as an error. In either case, contrast calculation on negative branch lengths is not a desirable outcome. Duplication of CAIC results therefore requires \code{polytomy.brlen} to be set to 1 and an analyis \emph{cannot} be duplicated precisely if the phylogeny contains polytomies with descending branches shorter than 1. The method used by \code {pic.lm} to handle polytomies avoids such problems.
 }
 \value{
   A list of class 'caic' containing the following:
