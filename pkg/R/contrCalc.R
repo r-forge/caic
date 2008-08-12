@@ -122,11 +122,12 @@ function(vals, phy, ref.var, picMethod, crunch.brlen){
                         
                         if(sum(compChild) > 2){
                             # This is the pagel method for polytomies 
+                            ## think about this - check out Nick Isaac's comment about only stalling on negative variance at a node.                            
                             bl <- bl - crunch.brlen
                             if(any(bl < 0)) stop("Crunch contrast calculation at a polytomy gives negative branch lengths.")
                             
-                            # is there any variance in the reference variable?
-                           if(var(rv) == 0){ 
+                            # is there any (meaningful) variance in the reference variable?
+                           if(var(rv) < .Machine$double.eps){ 
                                # compare first to the rest (as in CAIC)
                                 group <- c(TRUE, rep(FALSE, length(rv) -1))
                            } else {
@@ -203,8 +204,12 @@ function(vals, phy, ref.var, picMethod, crunch.brlen){
                                 currBlAdj <- 1/(sum(1/bl))
                             } else {
                                 # This is the pagel method for polytomies 
+                                
+                                ## think about this - check out Nick Isaac's comment about only stalling on negative variance at a node.
                                 bl <- bl - crunch.brlen
                                 if(any(bl <= 0)) stop("Brunch contrast calculation at a polytomy gives negative or zero branch lengths.")
+                                
+                                
                                 # find groupings a vector indicating whether each row 
                                 # is bigger or smaller than the mean of reference variable or is NA
                                 # TODO - Hmm. what to do if there is no variance in the reference variable
@@ -303,7 +308,7 @@ function(vals, phy, ref.var, picMethod, crunch.brlen){
                     }})
  
         # Insert nodal values back into the table to be used in more nested nodes
-        nodVal[parent,] <- currNV 
+        nodVal[parent,] <- currNV
         contrMat[parent,] <- currContr
         contrVar[parent] <- currVar
 
