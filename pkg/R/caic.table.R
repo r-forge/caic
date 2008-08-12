@@ -20,6 +20,7 @@ function(caicObj, validNodes=TRUE, nodalValues=FALSE, ultrametric.tol=0.0001, CA
         tab$nodeDepth <- caicObj$contrast.data$nodeDepth
         if(is.ultrametric(caicObj$phy, tol=ultrametric.tol)) tab$nodeAge <- branching.times(caicObj$phy) else tab$nodeAge <- NA
         stRes <- rstudent(caicObj$mod)
+        tab$studResid <- NA
         tab$studResid[match(as.numeric(names(stRes)), tab$nodeNumber)] <- stRes
         if(validNodes) tab <- subset(tab, validNodes, select=-validNodes)
        

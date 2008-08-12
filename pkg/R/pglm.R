@@ -124,6 +124,71 @@ lik.lambda <- function(x, V, data=NULL, lambda) {
 	return(mv.lik(x, V))
 }
 
+## lik.delta <- function(x, V, data=NULL, delta) {
+## 	
+## 	# data checking and sorting
+## 	if(is.null(data)){
+## 	    x <- order.D(x)
+## 	} else {
+## 	    if(! is.character(x)) stop("If not a named vector, 'x' must be a character string identifying a column 'data'")
+## 
+## 	    if(! x %in% names(data)) stop("Variable '", x, "' not found in dataset.")
+## 	    x <- subset(data, select=x, drop=TRUE)
+## 	    names(x) <- row.names(data)
+## 	    x <- order.D(x)
+## 	}
+##     
+##     # handle the possibility of a 3d VCV array
+##     if(inherits(V, 'vcv.array')) V <- apply(V, c(1,2), FUN=sum, na.rm=TRUE) # reduces the array to a standard VCV
+## 
+## 	V <- order.V(V)
+## 	
+##     if(! all(names(x) == rownames(V))) stop("Taxon names do not match between the sorted data and the sorted V matrix.")
+## 
+## 	# ditch missing data
+## 	missing <- which(is.na(x))
+## 	if(length(missing) > 0 ){
+##     	x <- x[-missing]
+##     	V <- V[-missing, -missing]
+## 	}
+## 	
+## 	delTrans <- function(V, delta) {
+## 		V <- V * delta
+## 		return(V)
+## 		}
+## 	
+## 	est.mean <- function(y, V) {
+## 		iV <- solve(V, tol = .Machine$double.eps)
+## 		xdum <- matrix(1, nrow = length(y))
+## 		xVix <- crossprod(xdum, iV %*% xdum)
+## 		xViy <- crossprod(xdum, iV %*% y)
+## 		mu <- solve(xVix, tol = .Machine$double.eps) %*% xViy # This is a bad thing!
+## 		return(mu[1])
+## 		}
+## 
+## 	est.var <- function(x, V) {
+## 		mu <- est.mean(x, V)
+## 		iV <- solve(V, tol = .Machine$double.eps)
+## 		e <- x - mu
+## 		s2 <- crossprod(e, iV%*%e)
+## 		n <- length(x) 
+## 		return(s2 / (n - 1) )
+## 		}
+## 
+## 	mv.lik <- function(x, V) {
+## 		mu <- est.mean(x, V)
+## 		s2 <- est.var(x, V)
+## 		n <- length(x)
+## 		logDetV <- determinant(V, logarithm = TRUE)$modulus[1]
+## 		ll <- -n / 2.0 * log( 2 * pi) - n / 2.0 * log(s2) - logDetV / 2.0 - (n-1) / 2.0
+## 		return( list(ll = ll, mu = mu, s2 = s2) )
+## 		}
+## 
+## 	V <- lamTrans(V, lambda)
+## 	return(mv.lik(x, V))
+## }
+
+
 
 lik.kappa <- function(x, V.arr, data=NULL, kappa) {
 	
