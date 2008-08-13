@@ -10,7 +10,7 @@ clade.stats(dat, phy, fun, ..., tips = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{data}{A data frame of numeric variables with rownames showing the tips to which each row of data belongs. Non-numeric variables are dropped.}
+  \item{dat}{A data frame of numeric variables with rownames showing the tips to which each row of data belongs. Non-numeric variables are dropped.}
   \item{phy}{ An object of class 'phylo'.}
   \item{fun}{ A function to be applied to subsets of numeric data at each node in the tree.}
   \item{\dots}{ Further arguments to be passed to 'fun'. }
