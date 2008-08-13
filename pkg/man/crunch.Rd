@@ -7,7 +7,7 @@
 Calculate a linear model using the crunch algorithm.
 }
 \usage{
-crunch(formula, data, phy, names.col, stand.contr = TRUE, ref.var=NULL, node.depth=NULL, polytomy.brlen=1, equal.branch.length=FALSE, factor.action="abort")
+crunch(formula, data, phy, names.col, stand.contr = TRUE, ref.var=NULL, node.depth=NULL, polytomy.brlen=0, equal.branch.length=FALSE, factor.action="abort")
 }
 
 
@@ -27,7 +27,7 @@ crunch(formula, data, phy, names.col, stand.contr = TRUE, ref.var=NULL, node.dep
 \details{
 This function implements the 'crunch' algorithm for modelling the relationship between variables that are phylogenetically non-independent. The method was first described by Felsenstein (1985) and subsequently extended to permit the use of phylogenies with polytomies by Pagel (1992). This method was previously implemented in the Mac Classic computer programs CAIC, written by Andy Purvis, Andy Rambaut (Purvis and Rambaut, 1995) and updated by Nick Isaac and Paul-Michael Agapow.
 
-The user provides a data frame and a phylogeny. These are matched using \code{names.col} to identify a column in the data frame that contains tip labels on the phylogeny. The formula specifies the model to be fitted and contrasts are calculated in those variables. The specified reference variable is used to ensure that contrasts for multivariate models are calculated in a consistent direction at each node. The function \code{caic} acts as a data preparation wrapper, finding the union between the phylogeny and data and reducing the dataset to the correct model and response matrices. The prepared data is then sent to the \code{contrCalc} engine, which is not intended to be called by users.
+The user provides a data frame and a phylogeny. These are matched using \code{names.col} to identify a column in the data frame that contains tip labels on the phylogeny. The formula specifies the model to be fitted and contrasts are calculated in those variables. The specified reference variable is used to ensure that contrasts for multivariate models are calculated in a consistent direction at each node. The function \code{crunch()} acts as a data preparation wrapper, finding the union between the phylogeny and data and reducing the dataset to the correct model and response matrices. The prepared data is then sent to the \code{contrCalc} engine, which is not intended to be called by users.
 
 The resulting table of contrasts is then used to fit the specified model - note that the intercept is automatically dropped from the model if present, following REF HERE. 
 
@@ -37,7 +37,7 @@ Contrasts at polytomies are calculated following Pagel (1992). The descendants f
 }
 
 \section{Warning}{
-At a polytomy, subtracting the internal branch length from the real branch lengths can lead to negative branch lengths. CAIC used a hard-coded internal branch length of 1 for calculating crunch contrasts at polytomies. From version 2.6.9, CAIC issued a warning if this lead to negative branch lengths but allowed contrast calculation to continue. In contrast, the implementation in \code{crunch()} uses a default internal branch length (\code{polytomy.brlen}) of 0 and also treats a negative branch length in a polytomy calculation as an error. In either case, contrast calculation on negative branch lengths is not a desirable outcome. Duplication of CAIC results therefore requires \code{polytomy.brlen} to be set to 1 and an analyis \emph{cannot} be duplicated precisely if the phylogeny contains polytomies with descending branches shorter than 1. The method used by \code {pic.lm} to handle polytomies avoids such problems.
+At a polytomy, subtracting the internal branch length from the real branch lengths can lead to negative branch lengths. CAIC used a hard-coded internal branch length of 1 for calculating crunch contrasts at polytomies. From version 2.6.9, CAIC issued a warning if this lead to negative branch lengths but allowed contrast calculation to continue. In contrast, the implementation in \code{crunch()} uses a default internal branch length (\code{polytomy.brlen}) of 0 and also treats a negative branch length in a polytomy calculation as an error. In either case, contrast calculation on negative branch lengths is not a desirable outcome. Duplication of CAIC results therefore requires \code{polytomy.brlen} to be set to 1 and an analyis \emph{cannot} be duplicated precisely if the phylogeny contains polytomies with descending branches shorter than 1. The method used by \code{pic.lm} to handle polytomies avoids such problems.
 }
 \value{
   A list of class 'caic' containing the following:

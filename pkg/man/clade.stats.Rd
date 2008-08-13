@@ -6,12 +6,12 @@
 Calculates a summary statistic at each node of a phylogeny, given data for the tips. Data is provided for each tip in a phylogeny and the function supplied by the user is applied to subsets of that data for each node with the phylogeny.
 }
 \usage{
-clade.stats(dataf, phyl, fun, ..., tips = FALSE)
+clade.stats(dat, phy, fun, ..., tips = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{dataf}{A data frame of numeric variables with rownames showing the tips to which each row of data belongs. Non-numeric variables are dropped.}
-  \item{phyl}{ An object of class 'phylo'.}
+  \item{data}{A data frame of numeric variables with rownames showing the tips to which each row of data belongs. Non-numeric variables are dropped.}
+  \item{phy}{ An object of class 'phylo'.}
   \item{fun}{ A function to be applied to subsets of numeric data at each node in the tree.}
   \item{\dots}{ Further arguments to be passed to 'fun'. }
   \item{tips}{A logical indicating whether to return the statistics for external nodes.}
