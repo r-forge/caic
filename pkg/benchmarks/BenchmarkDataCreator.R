@@ -21,22 +21,19 @@ while(discard){
                       dt.rates=discTraits, extend.proportion=1, grain=Inf)
 
 
-    # make seven internal polytomies...
+    # make seven-ish internal polytomies...
     collapseNodes <- with( BENCH, sort(edge.length[edge[,2] > Nnode +1]))[7]
     BENCHPoly <- align.tips(di2multi(BENCH, collapseNodes))
 
     # check that none of the polytomies have descendents on a branch less than 1
     nChild <- table(BENCHPoly$edge[,1])
     polyParent <- as.numeric(names(nChild)[nChild > 2])
-    discard <- any(BENCHPoly$edge.length[which(BENCHPoly$edge[,1] %in% polyParent)] <= 1)
+    polyDescBL <- BENCHPoly$edge.length[which(BENCHPoly$edge[,1] %in% polyParent)]
+    discard <- any(polyDescBL <= 1)
+    print(polyDescBL)
+    cat("looping\n")
 }
 
-
-write.tree(BENCH, file="BenchTreeDi.tre")
-write.tree(BENCHPoly, file="BenchTreePoly.tre")
-
-write.caic(BENCH, filebase="BenchTreeDi")
-write.caic(BENCHPoly, filebase="BenchTreePoly")
 
 # basic data types 
 # - continuous response
@@ -68,7 +65,6 @@ for(nd in seq(along=nDesc)){
     BenchData$contExp1NoVar[currDesc] <- nodeVals[names(nDesc)[nd], "contExp1"]    
 }
 
-
 # Testing handling of missing data for each variable - random 5% in each
 BenchData$contRespNA <- ifelse(runif(200) < 0.05, NA, BenchData$contResp)
 BenchData$contExp1NA <- ifelse(runif(200) < 0.05, NA, BenchData$contExp1)
@@ -92,6 +88,20 @@ CAICData$triFactNA <- unclass(CAICData$triFactNA)
 
 write.table(CAICData, file="BenchCAIC.dat", quote=FALSE, sep="\t", row.names=FALSE, na="-9")
 
+# make sure the three level factor is ordered
+BenchData$triFact <- ordered(BenchData$triFact, levels=c("A","B","C"))
+BenchData$triFactNA <- ordered(BenchData$triFactNA, levels=c("A","B","C"))
+
+
+# output the trees
+
+write.tree(BENCH, file="BenchTreeDi.tre")
+write.tree(BENCHPoly, file="BenchTreePoly.tre")
+
+write.caic(BENCH, filebase="BenchTreeDi")
+write.caic(BENCHPoly, filebase="BenchTreePoly")
+
+
 # now create a file of species richnesses at tips for testing MacroCAIC
 # same format and order as the .phyl but with nSpp in place of CAIC code.
 BenchRich <- scan("BenchTreeDi.phyl", what="character")
@@ -109,11 +119,11 @@ BenchRich <- matrix(BenchRich, ncol=2, byrow=TRUE)
 BenchRich <- BenchRich[match(BenchData$node, BenchRich[,2]),]
 BenchData$SppRich <- as.numeric(BenchRich[,1])
 
-save(BenchData, BENCH, BENCHPoly, file="CAIC_Benchmark.Rda")
+save(BenchData, BENCH, BENCHPoly, file="Benchmark.Rda")
 write.table(BenchData, file="BenchData.txt", quote=FALSE, sep="\t", row.names=FALSE)
 
 # output files for analysis in Fusco
-FuscoDi <- write.tree(BENCH, multi.line=FALSE)
+FuscoDi <- write.tree(BENCH)
 FuscoDi <- gsub(":[0-9\\.]+", "", FuscoDi) # get rid of the branch lengths
 
 # match in species richnesses
@@ -131,7 +141,7 @@ FuscoDi <- gsub("!", ",", FuscoDi)
 cat(FuscoDi, file="BenchDiFusco.txt")
 
 # output files for analysis in Fusco
-FuscoPoly <- write.tree(BENCHPoly, multi.line=FALSE)
+FuscoPoly <- write.tree(BENCHPoly)
 FuscoPoly <- gsub(":[0-9\\.]+", "", FuscoPoly) # get rid of the branch lengths
 
 # match in species richnesses
