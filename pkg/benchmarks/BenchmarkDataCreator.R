@@ -138,7 +138,7 @@ FuscoDi <- sub(";", "*", FuscoDi) # switch ; to *
 FuscoDi <- gsub("([0-9]),([0-9])", "\\1!\\2", FuscoDi)
 FuscoDi <- gsub(",", "", FuscoDi)
 FuscoDi <- gsub("!", ",", FuscoDi)
-cat(FuscoDi, file="BenchDiFusco.txt")
+cat("benchdi    ",FuscoDi, "\r\n", file="BenFusco.txt")
 
 # output files for analysis in Fusco
 FuscoPoly <- write.tree(BENCHPoly)
@@ -152,8 +152,8 @@ for(x in seq(along=BenchData$node)){
 }
 
 FuscoPoly <- sub(";", "*", FuscoPoly) # switch ; to *
-# remove commas except the one between tips
-FuscoPoly <- gsub("([0-9]),([0-9])", "\\1!\\2", FuscoPoly)
-FuscoPoly <- gsub(",", "", FuscoPoly)
-FuscoPoly <- gsub("!", ",", FuscoPoly)
-cat(FuscoPoly, file="BenchPolyFusco.txt")
+# remove commas by brackets
+FuscoPoly <- gsub("(\\)),", "\\1", FuscoPoly)
+FuscoPoly <- gsub(",(\\()", "\\1", FuscoPoly)
+
+cat("benchpoly    ",FuscoPoly, "\r\n", file="BenFusco.txt", append=TRUE)
