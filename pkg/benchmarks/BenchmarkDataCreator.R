@@ -123,15 +123,15 @@ save(BenchData, BENCH, BENCHPoly, file="Benchmark.Rda")
 write.table(BenchData, file="BenchData.txt", quote=FALSE, sep="\t", row.names=FALSE)
 
 # output files for analysis in Fusco
+
+# match species richnesses into the tree string
 FuscoDi <- write.tree(BENCH)
 FuscoDi <- gsub(":[0-9\\.]+", "", FuscoDi) # get rid of the branch lengths
-
-# match in species richnesses
-for(x in seq(along=BenchData$node)){
-    currPat <- paste("([\\(\\),])", BenchData$node[x], "([\\(\\),])", sep="")
-    repPat <- paste("\\1", BenchData$SppRich[x], "\\2", sep="")
-    FuscoDi <- sub(currPat, repPat, FuscoDi)
-}
+FuscoDi <- gsub("([0-9]+)","!\\1!", FuscoDi) # put some split characters around the nodes
+FuscoDi <- strsplit(FuscoDi, split="!")[[1]] # split the string into node number and topology
+nodeMatch <- match(FuscoDi, BenchData$node)
+FuscoDi <- ifelse(is.na(nodeMatch), FuscoDi, BenchData$SppRich[nodeMatch]) # switch richness with node number, keep topology
+FuscoDi <- paste(FuscoDi, sep="", collapse="") # and glue back together again
 
 FuscoDi <- sub(";", "*", FuscoDi) # switch ; to *
 # remove commas except the one between tips
@@ -140,16 +140,14 @@ FuscoDi <- gsub(",", "", FuscoDi)
 FuscoDi <- gsub("!", ",", FuscoDi)
 cat("benchdi    ",FuscoDi, "\r\n", file="BenFusco.txt")
 
-# output files for analysis in Fusco
+# match species richnesses into the tree string
 FuscoPoly <- write.tree(BENCHPoly)
 FuscoPoly <- gsub(":[0-9\\.]+", "", FuscoPoly) # get rid of the branch lengths
-
-# match in species richnesses
-for(x in seq(along=BenchData$node)){
-    currPat <- paste("([\\(\\),])", BenchData$node[x], "([\\(\\),])", sep="")
-    repPat <- paste("\\1", BenchData$SppRich[x], "\\2", sep="")
-    FuscoPoly <- sub(currPat, repPat, FuscoPoly)
-}
+FuscoPoly <- gsub("([0-9]+)","!\\1!", FuscoPoly) # put some split characters around the nodes
+FuscoPoly <- strsplit(FuscoPoly, split="!")[[1]] # split the string into node number and topology
+nodeMatch <- match(FuscoPoly, BenchData$node)
+FuscoPoly <- ifelse(is.na(nodeMatch), FuscoPoly, BenchData$SppRich[nodeMatch]) # switch richness with node number, keep topology
+FuscoPoly <- paste(FuscoPoly, sep="", collapse="") # and glue back together again
 
 FuscoPoly <- sub(";", "*", FuscoPoly) # switch ; to *
 # remove commas by brackets
