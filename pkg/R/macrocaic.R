@@ -43,15 +43,18 @@ function(formula, data, phy, names.col, macroMethod = "RRD", stand.contr = TRUE,
         resp.type <- match.arg(macroMethod, c("RRD", "PDI"))
         
                 
-        # check the phylogeny is a rooted phylogeny and set branch lengths...
+        # check the phylogeny is a rooted phylogeny 
         if(! inherits(phy, "phylo")) 
             stop("'", deparse(substitute(phy)), "' not of class 'phylo'")
         if(! is.rooted(phy))
             stop("'", deparse(substitute(phy)), "' is not rooted.")
         
-        
+        # check branch lengths
         if(as.logical(equal.branch.length)) {# doesn't get evaluated if FALSE or zero
             phy$edge.length <- rep(2, length(phy$edge.length))
+        } else {
+            if(is.null(phy$edge.length)) stop("The phylogeny does not contain branch lengths and macrocaic has not been set to use equal branch lengths.")
+            if(any(phy$edge.length <= 0)) stop("The phylogeny contains either negative or zero branch lengths and macrocaic has not been set to use equal branch lengths.")
         }
         
         # identify the name column and make sure it is of mode character
