@@ -2,7 +2,8 @@
 \documentclass[a4paper]{article}
 
 \usepackage{geometry}
-\setcounter{secnumdepth}{0}
+\usepackage[round]{natbib}
+%\setcounter{secnumdepth}{0}
 \setlength{\parskip}{9pt}
 \geometry{a4paper, textwidth=15cm, textheight=25cm}
 
@@ -27,9 +28,9 @@ The main benchmark dataset is  a 200 tip tree grown under a pure-birth, constant
 
 
 
-\section{Benchmarking against CAIC.}
+\section{Benchmarking \texttt{crunch()} and \texttt{brunch()}.}
 
-These benchmarks test the implementation of independent contrast calculations using the \texttt{crunch()} and \texttt{brunch()} algorithms in the package `CAIC' against the implementations in the Mac Classic program CAIC v2.6.9, running in Mac OS 9.2.2 emulation under Mac OS 10.4.10. 
+These benchmarks test the implementation of independent contrast calculations \citep{Felsenstein.1985.a} using the \texttt{crunch()} and \texttt{brunch()} algorithms in the package `CAIC' against the implementations in the Mac Classic program CAIC v2.6.9 \citep{Purvis.Rambaut.1995.a}, running in Mac OS 9.2.2 emulation under Mac OS 10.4.10. 
 
 The benchmark dataset, created using the the file  `BenchmarkDataCreator.R' and saved as `Benchmark.Rda' contains the following objects:
 \begin{description}
@@ -343,9 +344,9 @@ for(tst in 1:4){
 	currCAIC <- get(paste("CAIC", diffRangeTab$analysis[tst], sep="."))
 	currBrunch <- get(paste("brunch", diffRangeTab$analysis[tst], "tab", sep="."))
 	
-	diffRangeTab[1, 2:3] <- range(currCAIC[,3] - currBrunch[,2])
-	diffRangeTab[1, 4:5] <- range(currCAIC[,2] - currBrunch[,3])
-	diffRangeTab[1, 6:7] <- range(currCAIC[,4] - currBrunch[,4])
+	diffRangeTab[tst, 2:3] <- range(currCAIC[,3] - currBrunch[,2])
+	diffRangeTab[tst, 4:5] <- range(currCAIC[,2] - currBrunch[,3])
+	diffRangeTab[tst, 6:7] <- range(currCAIC[,4] - currBrunch[,4])
 }
 
 library(xtable)
@@ -355,5 +356,315 @@ caption(diffRangeTab) <- "Range in the differences between brunch and CAIC contr
 label(diffRangeTab) <- "brunchDiffs"
 print(diffRangeTab, include.rownames=FALSE)
 @
+
+\section{Benchmarking \texttt{macrocaic()}.}
+
+The function \texttt{macrocaic()} is a re-implementation of the program `MacroCAIC' \citep{Agapow.Isaac.2002.a}, which calculates standard contrasts \citep{Felsenstein.1985.a} for the explanatory variables but alternative contrasts in clade species richness for the explanatory variable. The program calculates two species richness contrast types which are included in the output file. Thes are `PDI', the proportion dominance index, and `RRD', the relative rate difference  \citep{Agapow.Isaac.2002.a}. The benchmark tests included 8 sets of analyses using all combinations of the following:
+
+\begin{description}
+\item[Di/Poly] The benchmark tree used: either dichotomous or polytomous.
+\item[Spp/Tax] Whether the tips are treated as single species or as taxa containing a known number of species.
+\item[23/67] The completeness of the explanatory data used, where 2 and 3 are two complete continuous variables and the variables in 6 and 7 have missing data.
+\end{description}
+
+The results from the original program are read in by the following code, sorted by the CAIC codes for the internal nodes and assigned to objects of the form `MacroCAIC.DiSpp23'. The original `MacroCAIC' log files from these analyses are concatenated together in the file `MacroCAIC\_bench.log'.
+
+<<>>=
+combos <- expand.grid(c("Di","Poly"), c("Spp","Tax"), c("23","67"))
+comboNames <- apply(combos,1, paste, collapse="")
+
+for(cm in comboNames){
+	objName <- paste("MacroCAIC", cm, sep=".")
+	fName <- paste("../../benchmarks/MacroCAIC_outputs/", cm,".txt", sep="")
+	MacroCAICTab <- read.delim(fName)
+	MacroCAICTab <- MacroCAICTab[order(MacroCAICTab$Code),] #$
+	
+	assign(objName, MacroCAICTab)
+}
+@
+
+The next section of code repeats each of these analyses using the function \texttt{macrocaic()} and then sorts the contrasts from the two implementations into the same order. The resulting contrasts are overplotted on the outputs from `MacroCAIC' for both RRD and PDI using complete and incomplete data (Figs. \ref{RRDComp},\ref{RRDMiss}, \ref{PDIComp},\ref{PDIMiss}). Again, the differences between the contrasts calculated at each node by each implementation are shown in Table \ref{MacroCAICTab}.
+
+<<>>=
+BenchData$TipsAsSpecies <- rep(1, 200) #$
+
+for(cm in seq(along=combos[,1])){
+
+	if(combos[cm,1] == "Di") currTree <- BENCH else currTree <- BENCHPoly
+	if(combos[cm,2] == "Spp") currRich <- "TipsAsSpecies" else currRich <- "SppRich"
+	if(combos[cm,3] == "23") currExpl <- "contExp1  + contExp2" else currExpl <- "contExp1NA + contExp2NA"
+	fm <- as.formula(paste(currRich, "~", currExpl))
+
+	RRDMod <- macrocaic(fm, data=BenchData, phy=currTree, names.col=node, macroMethod="RRD")
+	PDIMod <- macrocaic(fm, data=BenchData, phy=currTree, names.col=node, macroMethod="PDI")
+
+	RRDName <- paste("mcRRD", comboNames[cm], sep=".")
+	PDIName <- paste("mcPDI", comboNames[cm], sep=".")
+
+	RRDTab <- caic.table(RRDMod, CAIC.codes=TRUE, nodalValues=TRUE)
+	RRDTab <- RRDTab[order(RRDTab$CAIC.code),] #$
+	PDITab <- caic.table(PDIMod, CAIC.codes=TRUE, nodalValues=TRUE)
+	PDITab <- PDITab[order(PDITab$CAIC.code),] #$
+	
+	assign(RRDName, RRDTab )
+	assign(PDIName, PDITab)
+}
+@
+
+<<echo=FALSE, print=FALSE>>=
+# create a table to keep track of the differences 
+MacroCAICTab <- data.frame(analysis=I(comboNames), RRDMin=integer(8), RRDMax=integer(8), 
+                           PDIMin=integer(8), PDIMax=integer(8), Exp1Min=integer(8),
+                           Exp1Max=numeric(8), Exp2Min=integer(8), Exp2Max=numeric(8))
+
+
+@
+
+\begin{figure}[htbp]
+  \begin{center}
+<<echo=FALSE, fig=true, width=6, height=9.6>>=
+par(mfrow=c(4,2), mar=c(2,2,1,1), mgp=c(1,0,0), tcl=-.1)
+
+for(cm in 1:4){ # The analyses using complete data
+
+	currOrig <- get(paste("MacroCAIC", comboNames[cm], sep="."))
+	currR <- get(paste("mcRRD", comboNames[cm], sep="."))
+
+	plot(RRD ~ contExp1, data=currOrig)
+	points(x=currR$contExp1, y=currR[,2], col="red", pch=3, cex=0.8, ylab="RRD") #$
+
+	plot(RRD ~ contExp2, data=currOrig)
+	points(x=currR$contExp2, y=currR[,2], col="red", pch=3, cex=0.8, ylab="RRD") #$
+	
+	# fill in the difference table
+	MacroCAICTab[cm, 2:3] <- range(currOrig$RRD - currR[,2]) #$
+	MacroCAICTab[cm, 6:7] <- range(currOrig$contExp1 - currR$contExp1)
+	MacroCAICTab[cm, 8:9] <- range(currOrig$contExp2 - currR$contExp2)
+}
+
+@
+    \caption{Overplotting of results from MacroCAIC (black) and \texttt{macrocaic()} (red) analyses using RRD and complete data.}
+    \label{RRDComp}
+  \end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+  \begin{center}
+<<echo=FALSE, fig=true, width=6, height=9.6>>=
+par(mfrow=c(4,2), mar=c(2,2,1,1), mgp=c(1,0,0), tcl=-.1)
+
+for(cm in 5:8){ # The analyses using incomplete data
+
+	currOrig <- get(paste("MacroCAIC", comboNames[cm], sep="."))
+	currR <- get(paste("mcRRD", comboNames[cm], sep="."))
+
+	plot(RRD ~ contExp1NA, data=currOrig)
+	points(x=currR$contExp1NA, y=currR[,2], col="red", pch=3, cex=0.8, ylab="RRD") #$
+
+	plot(RRD ~ contExp2NA, data=currOrig)
+	points(x=currR$contExp2NA, y=currR[,2], col="red", pch=3, cex=0.8, ylab="RRD") #$
+	
+	# fill in the difference table
+	MacroCAICTab[cm, 2:3] <- range(currOrig$RRD - currR[,2]) #$
+	MacroCAICTab[cm, 6:7] <- range(currOrig$contExp1 - currR$contExp1)
+	MacroCAICTab[cm, 8:9] <- range(currOrig$contExp2 - currR$contExp2)
+
+}
+@
+    \caption{Overplotting of results from MacroCAIC (black) and \texttt{macrocaic()} (red) analyses using RRD and incomplete data.}
+    \label{RRDMiss}
+  \end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+  \begin{center}
+<<echo=FALSE, fig=true, width=6, height=9.6>>=
+par(mfrow=c(4,2), mar=c(2,2,1,1), mgp=c(1,0,0), tcl=-.1)
+
+for(cm in 1:4){ # The analyses using complete data
+
+	currOrig <- get(paste("MacroCAIC", comboNames[cm], sep="."))
+	currR <- get(paste("mcPDI", comboNames[cm], sep="."))
+
+	plot(PDI ~ contExp1, data=currOrig)
+	points(x=currR$contExp1, y=currR[,2], col="red", pch=3, cex=0.8, ylab="PDI") #$
+
+	plot(PDI ~ contExp2, data=currOrig)
+	points(x=currR$contExp2, y=currR[,2], col="red", pch=3, cex=0.8, ylab="PDI") #$
+
+	# fill in the difference table
+	MacroCAICTab[cm, 4:5] <- range(currOrig$PDI - currR[,2]) #$
+
+}
+
+@
+    \caption{Overplotting of results from MacroCAIC (black) and \texttt{macrocaic()} (red) analyses using PDI and complete data.}
+    \label{PDIComp}
+  \end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+  \begin{center}
+<<echo=FALSE, fig=true, width=6, height=9.6>>=
+par(mfrow=c(4,2), mar=c(2,2,1,1), mgp=c(1,0,0), tcl=-.1)
+
+for(cm in 5:8){ # The analyses using incomplete data
+
+	currOrig <- get(paste("MacroCAIC", comboNames[cm], sep="."))
+	currR <- get(paste("mcPDI", comboNames[cm], sep="."))
+
+	plot(PDI ~ contExp1NA, data=currOrig)
+	points(x=currR$contExp1NA, y=currR[,2], col="red", pch=3, cex=0.8, ylab="PDI") #$
+
+	plot(PDI ~ contExp2NA, data=currOrig)
+	points(x=currR$contExp2NA, y=currR[,2], col="red", pch=3, cex=0.8, ylab="PDI") #$
+	
+	# fill in the difference table
+	MacroCAICTab[cm, 4:5] <- range(currOrig$PDI - currR[,2]) #$
+
+}
+@
+    \caption{Overplotting of results from MacroCAIC (black) and \texttt{macrocaic()} (red) analyses using PDI and incomplete data.}
+    \label{PDIMiss}
+  \end{center}
+\end{figure}
+
+<<echo=FALSE, print=FALSE, results=tex>>=
+
+library(xtable)
+
+MacroCAICTab <- xtable(MacroCAICTab, digits=2, display=c("s","s","e","e","e","e","e","e","e","e"))
+caption(MacroCAICTab) <- "Range of differences between contrasts calcualted using MacroCAIC and the function \\texttt{macrocaic()}."
+label(MacroCAICTab) <- "MacroCAICTab"
+print(MacroCAICTab, include.rownames=FALSE)
+@
+
+
+\section{Benchmarking \texttt{fusco.test()}.}
+
+\subsection{Testing against the original FUSCO implementation.}
+This runs tests against Giuseppe Fusco's implementation of the phylogenetic imbalance statistic $I$ \citep{Fusco.Cronk.1995.a}. The original package consists of two DOS programs `IMB\_CALC' and `NULL\_MDL' which calculate the imbalance of phylogeny and then the expected distribution of imbalance values on a equal rates Markov tree, given the size of the tree. The program contains the option to consider the imbalance of the topology, treating each tip as a species, or of the distribution of species across tips, treating each tip as a taxon of one or more species. Each output file in the `benchmarks' folder contains the binned distribution data across nodes, some summary data for the tree and then the individual node calculations. These benchmark tests use both options on both the dichotomous and polytomous benchmark trees. The following code loads the benchmark outputs:
+
+<<>>=
+readFuscoOut <- function(fname){
+
+	distTab <- read.table(fname, skip=3, nrows=10, sep="|")
+	distTab <- distTab[, -c(1,6)]
+	colnames(distTab) <- c("imbalanceBin","obsFreq","corr","corrFreq")
+
+	distSum <- as.list(scan(fname, skip=15, n=10, what=list(NULL,1), sep="=")[[2]])
+	names(distSum) <- c("nSpp","nTips","nInfNodes","medianI","qdI")
+
+	nodes <- read.table(fname, skip=24, sep="|")
+	nodes <- nodes[,-c(1,7)]
+	colnames(nodes) <- c("node","nodeT","nodeB","nodeS","nodeI")
+
+	return(list(distTab=distTab, distSum=distSum, nodes=nodes))
+}
+
+FuscoDiSpp <- readFuscoOut("../../benchmarks/FUSCO_outputs/FuscoDiSpp.txt")
+FuscoDiTax <- readFuscoOut("../../benchmarks/FUSCO_outputs/FuscoDiTax.txt")
+FuscoPolySpp <- readFuscoOut("../../benchmarks/FUSCO_outputs/FuscoPolySpp.txt")
+FuscoPolyTax <- readFuscoOut("../../benchmarks/FUSCO_outputs/FuscoPolyTax.txt")
+@
+
+The following code duplicates these analyses using the \texttt{fusco.test} function. Summary statistics comparing the two implementations are then show in Table \ref{fuscoVals}. Note that the median and quartile deviation of $I$ in the summary information produced by `IMB\_CALC' and included in the benchmark files are \emph{not directly reproducible} using \texttt{fusco.test}.  However, the values presented here are medians and quartile deviations calculated in R directly from the node table generated by `IMB\_CALC'. The corrected nodal distributions of the original $I$ statistic \citep{Fusco.Cronk.1995.a}, calculated using the \texttt{plot} method, are shown plotted over the values from `IMB\_CALC' in Fig. \ref{fuscoPlots}.
+
+<<>>=
+fstest.DiSpp <- fusco.test(BENCH)
+fstest.DiTax <- fusco.test(BENCH, BenchData, rich=SppRich, names.col=node)
+fstest.PolySpp <- fusco.test(BENCHPoly)
+fstest.PolyTax <- fusco.test(BENCHPoly, BenchData, rich=SppRich, names.col=node)
+
+fstest.DiSpp.Hist   <- plot(fstest.DiSpp, I.prime=FALSE, plot=FALSE)
+fstest.DiTax.Hist   <- plot(fstest.DiTax, I.prime=FALSE, plot=FALSE)
+fstest.PolySpp.Hist <- plot(fstest.PolySpp, I.prime=FALSE, plot=FALSE)
+fstest.PolyTax.Hist <- plot(fstest.PolyTax, I.prime=FALSE, plot=FALSE)
+@
+
+<<echo=FALSE, print=FALSE, results=tex>>=
+# create a table of the differences 
+fuscoTab <- data.frame(analysis=I(c("FuscoDiSpp","fstest.DiSpp","FuscoDiTax","fstest.DiTax",
+						"FuscoPolySpp","fstest.PolySpp","FuscoPolyTax","fstest.PolyTax")),
+						nNode=integer(8), nTips=integer(8), nInfNodes=integer(8),
+						medianI=numeric(8), qdI=numeric(8))
+
+for(tst in 1:4){
+
+	currFusco <- get(fuscoTab$analysis[2*tst-1])
+	currfstest <- get(fuscoTab$analysis[2*tst])
+	
+	fuscoTab[2*tst-1, 2:6] <- c(unlist(currFusco$distSum)[1:3], median(currFusco$nodes$nodeI), IQR(currFusco$nodes$nodeI)/2) #$ just to turn off syntax colouring!
+	fuscoTab[2*tst, 2:6] <- unlist(currfstest[c(7,8,6,2,4)])
+
+}
+
+library(xtable)
+
+fuscoTab <- xtable(fuscoTab, digits=6, display=c("s","s","d","d","d","f","f"))
+caption(fuscoTab) <- "Calculation of Fusco and Cronk's (1995) I statistic."
+label(fuscoTab) <- "fuscoVals"
+print(fuscoTab, include.rownames=FALSE, hline.after=c(-1,0,2,4,6,8))
+@
+
+\begin{figure}[htbp]
+  \begin{center}
+<<echo=FALSE, fig=true, width=6, height=6>>=
+par(mfrow=c(2,2), mar=c(2,2,1,1), mgp=c(1,0,0), tcl=-.1)
+
+bks <- seq(0,1,by=0.1)
+
+for(tst in 1:4){
+
+	currFusco <- get(fuscoTab$analysis[2*tst-1])
+	currfstest <- get(fuscoTab$analysis[2*tst])
+	
+	with(currFusco$distTab, plot(structure(list(density=corrFreq, breaks=bks), #$
+	     class="histogram"), freq=FALSE, ylab="Corrected Frequency", main="",
+	     xlab="Nodal imbalance score (I)", border="grey"))
+
+	tmp <- plot(currfstest, I.prime=FALSE, plot=FALSE)
+
+	with(tmp, arrows(bks[-11]+0.025, correctedFrequency,bks[-11]+0.075, 
+	                 correctedFrequency, code=3, ang=90, len=0.05))
+}
+
+
+@
+    \caption{Histograms of nodal imbalance values from the program `IMB\_CALC' (grey bars) showing the corresponding values calculated using \texttt{fusco.test} in black.}
+    \label{fuscoPlots}
+  \end{center}
+\end{figure}
+
+\subsection{Testing against the extended implementation ($I, I', I_w$)in MeSA.}
+The original $I$ imbalance statistic showed a bias related to node size, demonstrated and corrected by \citet{Purvis.Katzourakis.ea.2002.a}. This revised calculation using either weights ($I_w$) or a modification to the calculation ($I'$) was implemented in the program MeSA (Agapow, 2006). The following code loads output from MeSA v1.9.23 running under Mac OS 10.5.3, repeating the calculations in \citet{Purvis.Katzourakis.ea.2002.a} of weights, $I$ and $I'$ on a genus-level tree of the Syrphidae.
+
+<<>>=
+MeSA.I <- scan("../../benchmarks/MeSA_outputs/MeSA_FuscoI.txt", sep="\n", what="character")
+MeSA.I <- strsplit(MeSA.I, split="\t")
+MeSA.I <- lapply(MeSA.I, function(X)X[-1:-2])
+MeSA.I <- as.data.frame(MeSA.I, stringsAsFactors=FALSE)[,c(-5,-7)]
+names(MeSA.I) <- c("clade","I","weight","nodeSize","Iprime")
+MeSA.I$I <- as.numeric(MeSA.I$I)
+MeSA.I$weight <- as.numeric(MeSA.I$weight)
+MeSA.I$nodeSize <- as.numeric(MeSA.I$nodeSize)
+MeSA.I$Iprime <- as.numeric(MeSA.I$Iprime)
+@
+
+The next code block replicates these calculations using \texttt{fusco.test} and displays the calculated mean values for both the original $I$ and $I'$ from both implementations.
+
+<<>>=
+syrphTree <- read.nexus("../../benchmarks/syrphidae.nexus")
+syrphRich <- read.delim("../../benchmarks/syrphidae_tabbed.txt", header=FALSE, col.names=c("genus","nSpp"))
+
+fstest.Syrph <- fusco.test(syrphTree, dat=syrphRich, rich=nSpp, names=genus)
+summary(fstest.Syrph)
+
+mean(MeSA.I$Iprime)
+median(MeSA.I$I)
+@
+
+\bibliographystyle{plainnat}
+\bibliography{/Users/dorme/References/NewReferences/CDLO_references}
 
 \end{document}
