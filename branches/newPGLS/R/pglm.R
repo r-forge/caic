@@ -351,7 +351,7 @@ lam.test.single <- function(x, data, V, pretty=TRUE) {
 
 ## TODO - rename phylomat to V throughout to maintain consistenct with profile functions...
 
-pglm <- function(formula, data, phylomat, lambda = 1.0, ...) {
+pglm <- function(formula, data, V, lambda = 1.0, kappa = 1.0,  delta= 1.0, control=list(fnscale=-1)) {
 
 	prune <- function(dat, Vmat) {
 	# ------ Delete from here if you want to take the risk! ---------------------	
@@ -387,15 +387,6 @@ pglm <- function(formula, data, phylomat, lambda = 1.0, ...) {
 		D <- svdCmat$u %*% diag(sqrt( svdCmat$d )) %*% t(svdCmat$v)
 		return( t(D) )
 	}
-			
-	lamTrans <- function(Vmat, lambda) {
-		V1 <- Vmat
-		diag(V1) <- 0
-		V2 <- diag( diag(Vmat), ncol = length(Vmat[1,]), nrow = length(Vmat[,1]))
-		Vmat <- V1 * lambda + V2
-		return(Vmat)
-	}
-	
 	
 	## CDLO - commented out. This function is currently unused within pglm() and contains
 	##        the mystery variable nx, which is not declared anywhere
@@ -409,7 +400,7 @@ pglm <- function(formula, data, phylomat, lambda = 1.0, ...) {
 	## 	n <- length(y) 
 	## 	return( s2 / (n- nx) )
 	## }
-		
+
 	# Estimates the GLS parameters for given data
 	get.coeffs <- function(Y, V, X) {
 		iV <- solve(V, tol = .Machine$double.eps)
@@ -428,32 +419,47 @@ pglm <- function(formula, data, phylomat, lambda = 1.0, ...) {
 		k <- length(x[1,])
 		return( s2 / (n- k) )
 	}
-	
+
+    blenTransform <- function(V, par){
+         # apply transformations
+        if(par["kappa"] == 0) V <- (V > 0) else V <-  V ^ par["kappa"] # kappa catching NA^0=1
+        V <- apply(V, c(1,2), sum, na.rm=TRUE) # collapse 3D array
+        V <- ifelse(upper.tri(V)+lower.tri(V), V * par["lambda"], V) # lambda
+        if(par["delta"] == 0) V <- (V > 0) else V <-  V ^ par["delta"] # delta catching NA^0=1
+    }
+
 	# Full ML estimation for given x and V
-	log.likelihood <- function(y, x, V) {
+	# modified to also act as an engine for optim
+	# - the function is passed named vectors containing kappa, lambda and delta
+	#   which might be available for optimization (optimPar) or user defined (fixedPar)
+	log.likelihood <- function(optimPar, fixedPar, y, x, V, optim.output=TRUE) {
+	    
+	    # merge  the values of KLD from the two parameter vectors
+        allPar <- c(optimPar, fixedPar)
+	    
+        V <- blenTransform(V, allPar)
+
 		mu <- get.coeffs(y, V, x)
 		s2 <- est.var(y, V, x, mu)
 		n <- length(x[,1])
-		logDetV <- determinant(Vmat, logarithm = TRUE)$modulus[1]
+		logDetV <- determinant(V, logarithm = TRUE)$modulus[1]
 		ll <- -n / 2.0 * log( 2 * pi) - n / 2.0 * log(s2) - logDetV / 2.0 - (n - 1)/2.0
 		ypred <- x%*%mu	
-		return( list(ll = ll, mu = mu, s2 = s2) )
+
+		# if being used for optimization, only return the log likelihood
+		if(optim.output) return(ll)  else return( list(ll = ll, mu = mu, s2 = s2) )
 	}
-		
-		
+
 	null.var <- function(y, V) {
 		X <- matrix(1, nrow = length(y))
 		mu <- get.coeffs(y, V, X)
 		return(est.var(y, V, X, mu))
 	}
 
-	
-	Vmat <- as.matrix(phylomat)
-	Vmat <- lamTrans(phylomat, lambda)
-	
-	prune.dat <- prune(data, Vmat)
-	Vmat <- prune.dat$Vmat
-	data <- prune.dat$dat
+	if(length(dim(V)) != 3) stop("3D phylo.array for kappa estimation.")
+	#prune.dat <- prune(data, V) 
+	#V <- prune.dat$V
+	#data <- prune.dat$dat
 	nm <- names(data)
 	
 	n <- length(data[,1])
@@ -465,8 +471,50 @@ pglm <- function(formula, data, phylomat, lambda = 1.0, ...) {
 	k <- length(x[1,])
 	
 	namey <- names(m)[1]
+
+	# sort out the branch length transformations
+	# sensible values?
+	if(length(lambda) > 1 | (is.character(lambda) & ! lambda=="ML") | (is.numeric(lambda) & (lambda < 0 | lambda >1))) 
+	    stop("lambda must be a single number between 0 and 1 or 'ML'.")
+	if(length(kappa) > 1 | (is.character(kappa) & ! kappa=="ML") | (is.numeric(kappa) & kappa < 0)) 
+	    stop("kappa must be a single number greater than 0 or 'ML'.")
+	if(length(delta) > 1 | (is.character(delta) & ! delta=="ML") | (is.numeric(delta) & delta < 0)) 
+	    stop("delta must be a single number greater than 0 or 'ML'.")
 	
-	ll <- log.likelihood(y, x, Vmat)
+	parVals <- c(kappa=kappa, lambda=lambda, delta=delta)
+	mlVals <- parVals == "ML"
+
+	if(any(mlVals)){
+	    
+    	# isolate parameters to be optimized and set to a sensible start.
+    	parVals[mlVals] <- 1
+    	parVals <- as.numeric(parVals)
+    	names(parVals) <- c("kappa", "lambda","delta")
+
+    	optimPar <- parVals[mlVals]
+    	fixedPar <- parVals[!mlVals]
+    	
+    	# define the optimization bounds
+    	upper.b <- c(3, 1, 3)[mlVals]
+    	lower.b <- c(0, 0, 0)[mlVals]
+    	
+    	optim.param.vals <- optim(optimPar, fn = log.likelihood, # function and start vals
+    	    method="L-BFGS-B", control=control, upper=upper.b, lower=lower.b, # optim control
+    	    V = V, y=y, x=x, fixedPar = fixedPar, optim.output=TRUE) # arguments to function
+	    
+    	if(optim.param.vals$convergence != "0"){
+    		stop("Problem with optim:", optim.param.vals$convergence, 
+    		    optim.param.vals$message)}
+	    
+    	fixedPar <- c(optim.param.vals$par, fixedPar)
+    	fixedPar <- fixedPar[c("kappa","lambda","delta")]
+    } else {
+        fixedPar <- parVals
+    }
+    
+	# run the likelihood function again with the fixed parameter values
+	V <- blenTransform(V, fixedPar)
+	ll <- log.likelihood(optimPar=NULL, fixedPar=fixedPar, y, x, V, optim=FALSE)
 	
 	log.lik <- ll$ll	
 
@@ -482,12 +530,12 @@ pglm <- function(formula, data, phylomat, lambda = 1.0, ...) {
 	pred <- x %*% ll$mu 
 	
 	res <- y - pred
-	D <- Dfun(Vmat)
+	D <- Dfun(V)
 	pres <- D %*% res
 	
 	fm <- list(coef = coeffs, aic = aic, log.lik = log.lik)
 	
-	logDetV <- determinant(Vmat, logarithm = TRUE)$modulus[1]
+	logDetV <- determinant(V, logarithm = TRUE)$modulus[1]
  	
 	logLikY <- -n / 2.0 * log( 2 * pi) - n / 2.0 * log(ll$s2) - logDetV / 2.0  - (n - 1 )/ 2.0
 	
@@ -497,12 +545,12 @@ pglm <- function(formula, data, phylomat, lambda = 1.0, ...) {
 	NSSQ <- RSSQ
 	
 	if(k > 0) {
-		NMS <- null.var(y, Vmat)
+		NMS <- null.var(y, V)
 		NSSQ <- NMS * (n - 1)
 		}
 
 	# Bits for parameter errors	
-	errMat <- t(x)%*% solve(Vmat) %*% x  
+	errMat <- t(x)%*% solve(V) %*% x  
 	errMat <- solve(errMat) * RMS[1] 
 	sterr <- diag(errMat)
 	sterr <- sqrt(sterr)
@@ -511,7 +559,7 @@ pglm <- function(formula, data, phylomat, lambda = 1.0, ...) {
 	ret <- list(model = fm, formula = formula, logLikY = logLikY, RMS = RMS, NMS = NMS,
 	            NSSQ = NSSQ[1], RSSQ = RSSQ[1], aic = aic, aicc = aicc, n = n, k = k,
 	            sterr = sterr, vcv = errMat, fitted = pred, residuals = res, phyres = pres,
-	            x = x, data = data,  varNames = varNames, y = y, V = Vmat, lambda = lambda,
+	            x = x, data = data,  varNames = varNames, y = y, V = V, param = fixedPar, mlVals=mlVals,
 	            L0 = NULL, L1 = NULL, LamOptimised = FALSE, namey = namey)
 
 	class(ret) <- "pglm"
@@ -598,7 +646,8 @@ summary.pglm <- function(object,...) {
 	cat("Phylogeny:\n\n")
 	cat("Number of parameters = ", object$k,"\n")
 	cat("Number of data points = ", object$n,"\n\n")
-	cat("Lambda statistic = ", object$lambda, "\n")
+	cat("Branch length transformations:\n")
+    cat(sprintf("%-6s : %0.4f [%s]", names(object$param), object$param, ifelse(object$mlVals, "ML", "Fixed")), sep="\n")
 	if(object$LamOptimised == TRUE) { testLambda(object)}
 	cat("Maximised log-likelihood = ", object$logLikY,"\n\n")
 	cat("Model AIC = ", object$aic, "\n")
@@ -745,7 +794,9 @@ anova.pglm <- function(object, ...) {
 # ----------------------------------------------------------------------
 # Functions for getting the phylo matrix and data in alphabetical order
 #
-order.V <- function(V) { # CDLO argument changed from Vmat to V for consistency
+# CDLO argument changed from Vmat to V for consistency
+
+order.V <- function(V) { 
     
     if(! is.array(V)) stop("V is not a matrix or array")
     nmV <- dimnames(V)
