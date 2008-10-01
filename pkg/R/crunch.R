@@ -100,8 +100,8 @@ function(formula, data, phy, names.col, stand.contr = TRUE, ref.var=NULL, node.d
         # Size of conjunction of tree and dataset
         unionData <- dim(data)[1] 
 
-        # reduce to just the variables used in the formula
-        data <- subset(data, select=all.vars(formula))
+        # reduce to just the variables used in the formula and the names column
+        data <- subset(data, select=c(names.col, all.vars(formula)))
         
     # HANDLE CATEGORICAL VARIABLES:
         # find the factors - (number of levels > 0)
