@@ -90,9 +90,11 @@ function(formula, data, phy, names.col, stand.contr = TRUE, ref.var=NULL, node.d
         # Size of conjunction of tree and dataset
         unionData <- dim(data)[1] 
         
-        # reduce to just the variables used in the formula and the names column
-        data <- subset(data, select=c(names.col, all.vars(formula)))
-        
+        # reduce to just the variables used in the formula so they can all be treated as numeric 
+        # but hang on to tip labels for subsetting the phylogeny down to complete tips
+        tipLabs <- subset(data, select=names.col, drop=TRUE)
+        data <- subset(data, select=all.vars(formula))
+          
     # CALCULATE MODEL 
     # GET THE MODEL MATRIX and Model Response
         
@@ -132,8 +134,6 @@ function(formula, data, phy, names.col, stand.contr = TRUE, ref.var=NULL, node.d
         if(any( varLevels > 2 & ! varIsOrdered )) stop("Unordered non-binary factors included in model formula.")
         
         # refit the model frame with numericized data
-        #data <- as.data.frame(lapply(data, function(x) as.numeric(as.factor(x))))
-        data$tip <- as.factor(data$tip)
         data <- as.data.frame(lapply(data, as.numeric))
         mf <- model.frame(formula, data, na.action=na.pass)
 
@@ -194,7 +194,7 @@ function(formula, data, phy, names.col, stand.contr = TRUE, ref.var=NULL, node.d
         
         # get the node depth using the tree for which we have complete data
         # and then match those nodes up against the analysis tree
-        tipsWithNAdata <- data[,names.col][! complete.cases(mf)]
+        tipsWithNAdata <- tipLabs[! complete.cases(mf)]
         if(length(tipsWithNAdata) > 0){
         	compPhy <- drop.tip(analysisPhy, tipsWithNAdata) 
     	}	else { compPhy <- analysisPhy }

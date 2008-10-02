@@ -100,8 +100,10 @@ function(formula, data, phy, names.col, stand.contr = TRUE, ref.var=NULL, node.d
         # Size of conjunction of tree and dataset
         unionData <- dim(data)[1] 
 
-        # reduce to just the variables used in the formula and the names column
-        data <- subset(data, select=c(names.col, all.vars(formula)))
+        # reduce to just the variables used in the formula so they can all be treated as numeric 
+        # but hang on to tip labels for subsetting the phylogeny down to complete tips
+        tipLabs <- subset(data, select=names.col, drop=TRUE)
+        data <- subset(data, select=all.vars(formula))
         
     # HANDLE CATEGORICAL VARIABLES:
         # find the factors - (number of levels > 0)
@@ -185,7 +187,7 @@ function(formula, data, phy, names.col, stand.contr = TRUE, ref.var=NULL, node.d
         
         # get the node depth using the tree for which we have complete data
         # and then match those nodes up against the analysis tree
-        tipsWithNAdata <- data[,names.col][! complete.cases(mf)]
+        tipsWithNAdata <- tipLabs[! complete.cases(mf)]
         if(length(tipsWithNAdata) > 0){
         	compPhy <- drop.tip(analysisPhy, tipsWithNAdata) 
     	}	else { compPhy <- analysisPhy }
