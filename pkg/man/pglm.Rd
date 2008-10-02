@@ -83,9 +83,9 @@ Returns an object of class \code{pglm} containing the following:
  \item{LamOptimised}{A logical indicating whether the fitted lambda has been optimised using \code{pglmEstLambda()}}
  \item{namey}{The name of the y variable.}
 }
-\references{ ~put references to the literature/web site here ~ }
+%\references{ ~put references to the literature/web site here ~ }
 \author{Rob Freckleton; David Orme}
-\note{}
+%\note{}
 \seealso{\code{\link{profile.lambda}} }
 \examples{
 

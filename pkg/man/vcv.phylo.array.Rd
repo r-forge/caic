@@ -15,7 +15,7 @@ vcv.phylo.array(phy)
 A 3 dimensional array of class 'vcv.phylo.array' with dimensions of the number of taxa in the phylogeny for the rows and columns and the maximum number of branches on root to tip path as the depth. The rows and columns are named using the tip labels from the phylogeny and the depth is not named. A pair of row and column coordinates will extract a vector of all branch lengths shared by a pair of taxa, padded with NA in order to accomodate the longest such vector. The apply function can be easily used to collapse the array down to a standard VCV matrix, as in the example.
 }
 \author{David Orme}
-\seealso{ \code{\link{vcv.phylo}}, \code{\link{lik.kappa}},}
+\seealso{ \code{\link[ape]{vcv.phylo}}, \code{\link{lik.kappa}},}
 \examples{
 tree <- rcoal(8)
 tree.VCV <- vcv.phylo(tree)

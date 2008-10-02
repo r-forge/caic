@@ -1,11 +1,11 @@
-\name{caicPack-package}
-\alias{caicPack-package}
-\alias{caicPack}
+\name{caic-package}
+\alias{caic-package}
+%\alias{caicPack}
 \docType{package}
 \title{
 A package to carry out comparative analysis using independent contrasts.
 }
-\description{
+\description{The \pkg{CAIC} package implements methods CAIC and MacroCAIC for comparative analysis of independent contrasts and to derive correlates of species richness.
 }
 \details{
 \tabular{ll}{

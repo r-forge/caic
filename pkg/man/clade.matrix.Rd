@@ -22,7 +22,7 @@ The clade matrix shows the tips from a phylogeny that subtend from each internal
 }
 \author{David Orme}
 
-\seealso{}%%\code{\link{pd.calc}}, \code{\link{pd.bootstrap}}, \code{\link{clade.stats}}}
+%\seealso{}%%\code{\link{pd.calc}}, \code{\link{pd.bootstrap}}, \code{\link{clade.stats}}}
 \examples{
 data(SmallTree)
 clade.matrix(diTree)

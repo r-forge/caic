@@ -26,7 +26,7 @@ A numeric vector of external node (i.e. tip) numbers or a character vector of ti
 \author{David Orme}
 
 
-\seealso{} %% \code{\link{clade.stats}} }
+%\seealso{} %% \code{\link{clade.stats}} }
 \examples{
 data(SmallTree)
 clade.members(22, diTree, tip.labels=TRUE)

@@ -9,11 +9,16 @@
 \title{Deprecated functions in the caic package}
 \description{These functions are deprecated and are now simply redirections to the replacement functions}
 \usage{
-profile.lambda(x, dat, V)
-profile.kappa(x, V)
-max.lik.lambda(x, V, dat)
-max.lik.kappa(x, V)
-all.clades(phy, tips=FALSE, tip.labels=FALSE)
+\method{profile}{lambda}(x, dat, V)
+\method{profile}{kappa}(x, V)
+\method{max.lik}{lambda}(x, V, dat)
+\method{max.lik}{kappa}(x, V)
+\method{all}{clades}(phy, tips=FALSE, tip.labels=FALSE)
+%profile.lambda(x, dat, V)
+%profile.kappa(x, V)
+%max.lik.lambda(x, V, dat)
+%max.lik.kappa(x, V)
+%all.clades(phy, tips=FALSE, tip.labels=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

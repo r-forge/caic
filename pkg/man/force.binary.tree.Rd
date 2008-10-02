@@ -15,8 +15,8 @@ force.binary.tree(phylo, arb.branch = 0, node.suffix="_Poly")
   most purposes.}
   \item{node.suffix}{The node labels of the phylogeny are amended to indicate which are resolved polytomies - this suffix is used to identify originally polytomous nodes and the shared polychotomy from which they have been split.}
 }
-\details{
-}
+%\details{
+%}
 
 \value{
 An object of class \code{"phylo"} with no polytomies.

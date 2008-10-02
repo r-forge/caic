@@ -12,9 +12,9 @@ The function provides a wrapper to allow the user to generate predictions or obt
   \item{object}{A caic object}
   \item{\dots}{Arguments to be passed to 'predict.lm'.}
 }
-\details{
-  ~~ If necessary, more details than the description above ~~
-}
+%\details{
+%  ~~ If necessary, more details than the description above ~~
+%}
 \value{
   ~Describe the value returned
   If it is a LIST, use
@@ -24,10 +24,8 @@ The function provides a wrapper to allow the user to generate predictions or obt
 }
 \author{David Orme}
 \seealso{ \code{\link{predict.lm}}}
-\examples{
-
-
-}
+%\examples{
+%}
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
