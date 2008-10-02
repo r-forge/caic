@@ -98,7 +98,7 @@ for(sub in split(dat, dat$tx)) abline(lm(y~x,  data=sub), col=unclass(sub$tx)[1]
 
 \section{Datasets}
 
-The example in this document will make use of the following artificially generated datasets. In addition to being used in these examples, these datasets were also analyzed using the original programs and so  provide a benchmark test for the reimplemenation
+The example in this document will make use of the following artificially generated datasets. In addition to being used in these examples, these datasets were also analysed using the original programs and so  provide a benchmark test for the re-implemenation
 
 \begin{description}
   \item[SmallTree] A dataset containing two phylogenies and two data frames. One phylogeny (diTree) is a 15 tip, fully bifurcating tree; three nodes in this phylogeny have been collapsed to give a second topology (polyTree) containing polytomies (Fig. \ref{smalltrees}). The data frames (SmallTreeDat and SmallTreeDatNA) contain data for each of the tips in the tree. They contain a column of tip names (tip), two continuous variables (weight and othervar), a column of the number of species in the tip group (nSpp) and two categorical variables (catX2 and catX3). SmallTreeDatNA differs only in having two tips for which no data is available.
@@ -144,7 +144,7 @@ The CAIC package implements both CAIC and MacroCAIC analyses using a formula int
 
 
 \bibliographystyle{plainnat}
-\bibliography{/Users/dorme/References/NewReferences/CDLO_references}
+\bibliography{inst/doc/CAIC_refs.bib}
 
 
 \end{document}

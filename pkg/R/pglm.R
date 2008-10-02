@@ -316,7 +316,7 @@ max.lik.kappa <- function(x, V){
 
 lam.test.single <- function(x, data, V, pretty=TRUE) {
 
-	prune.dat <- prune.single(x, dat, V)
+	prune.dat <- prune.single(x, data, V)
 	
 	Vmat <- prune.dat$V
 	data <- prune.dat$dat

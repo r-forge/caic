@@ -665,6 +665,6 @@ median(MeSA.I$I)
 @
 
 \bibliographystyle{plainnat}
-\bibliography{/Users/dorme/References/NewReferences/CDLO_references}
+\bibliography{inst/doc/CAIC_refs.bib}
 
 \end{document}
