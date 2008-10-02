@@ -1,5 +1,7 @@
 \name{caic-package}
 \alias{caic-package}
+\alias{CAIC}
+
 %\alias{caicPack}
 \docType{package}
 \title{
