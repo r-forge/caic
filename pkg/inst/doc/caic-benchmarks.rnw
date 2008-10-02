@@ -665,6 +665,6 @@ median(MeSA.I$I)
 @
 
 \bibliographystyle{plainnat}
-\bibliography{inst/doc/CAIC_refs.bib}
+\bibliography{CAIC_refs}
 
 \end{document}

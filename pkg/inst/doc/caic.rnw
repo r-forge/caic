@@ -144,7 +144,7 @@ The CAIC package implements both CAIC and MacroCAIC analyses using a formula int
 
 
 \bibliographystyle{plainnat}
-\bibliography{inst/doc/CAIC_refs.bib}
+\bibliography{CAIC_refs}
 
 
 \end{document}
