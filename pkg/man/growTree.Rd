@@ -46,7 +46,7 @@ Depending on the value of \code{output.phylo}, either an object of class 'phylo'
   \item{ct.set}{If continuous characters were simulated, a list of the \code{ct.start}, \code{ct.change} and \code{ct.var} details provided.}
   \item{dt.rates}{If discrete characters were simulated, a list containing the \code{dt.rates} details provided.}
 }
-\references{ ~put references to the literature/web site here ~ }
+%\references{ ~put references to the literature/web site here ~ }
 \author{David Orme, drawing heavily on discussions with Paul-Michael Agapow.}
 \examples{
 

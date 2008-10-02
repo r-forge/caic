@@ -61,7 +61,7 @@ The \code{profile} functions invisibly return a data frame of the \code{at} valu
 The \code{maxLik} functions return \code{optimize} output: namely, a list with components maximum and objective which give the location of the maximum likelihood and the value of the lambda or kappa at that point.
 
 }
-\references{ ~put references to the literature/web site here ~ }
+%\references{ ~put references to the literature/web site here ~ }
 \author{Rob Freckleton; David Orme; Gavin Thomas}
 \seealso{\code{\link{pglm}}}
 \examples{

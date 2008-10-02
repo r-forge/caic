@@ -23,6 +23,7 @@ Both files are simple text files with the following formats. The first file, wit
 }
 \references{
 Purvis, A. and Rambaut, A. (1995) Comparative analysis by independent contrasts (CAIC): an Apple Macintosh application for analysing comparative data.  Computer Appl. Biosciences 11, 247-251.
+
 Agapow, P.-M. and Isaac, N. J. B. (2002) MacroCAIC: correlates of species richness. Diversity & Distributions, 8, 41-43
 }
 \author{David Orme}

@@ -79,6 +79,7 @@ If \code{randomise.Iprime} is TRUE, or the user calls \code{fusco.randomize} on 
 }
 \references{
 Fusco, G. & Cronk, Q.C.B. (1995) A New Method for Evaluating the Shape of Large Phylogenies. J. theor. Biol. 175, 235-243
+
 Purvis A.,  Katzourakis A. & Agapow, P-M (2002) Evaluating Phylogenetic Tree Shape: Two Modifications to Fusco & Cronk's Method. J. theor. Biol. 214, 93-103.
 }
 \author{David Orme, Andy Purvis}

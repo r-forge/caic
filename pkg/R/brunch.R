@@ -132,6 +132,8 @@ function(formula, data, phy, names.col, stand.contr = TRUE, ref.var=NULL, node.d
         if(any( varLevels > 2 & ! varIsOrdered )) stop("Unordered non-binary factors included in model formula.")
         
         # refit the model frame with numericized data
+        #data <- as.data.frame(lapply(data, function(x) as.numeric(as.factor(x))))
+        data$tip <- as.factor(data$tip)
         data <- as.data.frame(lapply(data, as.numeric))
         mf <- model.frame(formula, data, na.action=na.pass)
 

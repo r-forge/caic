@@ -33,7 +33,7 @@ This function generates plots of absolute values of calculated contrast against 
 \value{
 If \code{test.signif} is TRUE, a list with class `caic.diagonistics' containing, for each of the model terms in \code{which.terms}, a list of \code{lm} objects testing the relationship between the values in each of the specified \code{which.plots}. Otherwise, the command only produces the plots and no value is returned.
 }
-\references{ ~put references to the literature/web site here ~ }
+%\references{ ~put references to the literature/web site here ~ }
 \author{ David Orme }
 \seealso{\code{\link{crunch}}, \code{\link{brunch}}, \code{\link{macrocaic}}}
 \examples{
