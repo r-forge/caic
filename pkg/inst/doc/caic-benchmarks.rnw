@@ -73,7 +73,8 @@ CAIC.CrPl657 <- read.delim("../../benchmarks/CAIC_outputs/BenchCAIC.dat_CrPl657"
 The next section of code duplicates these CAIC analyses using the \texttt{crunch()} function. Note that the default internal branch length used in calculations at a polytomy (\texttt{polytomy.brlen}) needs to be changed from the 0, which is the default in \texttt{crunch()}, to 1, which was the default in CAIC. The \texttt{caic.table()} function is used to extract a contrast table from the \texttt{crunch()} output, including CAIC style node labels.
 
 <<>>=
-load("../../benchmarks/Benchmark.rda")
+#load("../../benchmarks/Benchmark.rda")
+load("Benchmark.Rda")
 library(CAIC)
 crunch.CrDi213 <- crunch(contResp ~ contExp1 + contExp2, data=BenchData, phy=BENCH, names.col=node, polytomy.brlen=1)
 crunch.CrDi213.tab <- caic.table(crunch.CrDi213, CAIC.codes=TRUE)
