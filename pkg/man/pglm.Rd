@@ -49,6 +49,9 @@ pglmEstLambda(formula, data, phylomat, plotit=FALSE, ...)
 
 \details{
 This function fits a linear model controlling for the non-independence between cases resulting from phylogenetic structure in the data. The strength of the phylogenetic signal can be controlled by altering the parameter lambda, which scales the covariance between data points (the off-diagonals of \code{phylomat}, representing the amount of shared evolutionary history) as the product of this shared history and lambda. A lambda of 0 is equivalent to a standard linear model, with all shared phylogenetic history reduced to zero, and a lambda of 1 uses the original covariance matrix. The function \code{pglmEstLambda} identifies the maximum likelihood value of lambda for a given model formula and also tests, using a log likelihood ratio test, whether this model is significantly more likely than a lambda of 0 or 1.
+
+The implementation of the method is currently as described in Freckleton et al (2002). This section will be expanded to compare the results obtained in this implementation to that of Pagel's Continuous.
+
 }
 \section{Warning}{
 The model is fitted using a data frame reduced to complete row cases to eliminate missing values. In order to ensure that the models fitted using different subsets of the data are comparable, the whole data frame \code{data} is reduced to complete cases. In the future, a scope argument may be provided to control this but at present the data frame should be reduced to only those variables used in the maximal model in order to avoid prevent redundant variables causing rows to be dropped unnecessarily.
@@ -83,7 +86,8 @@ Returns an object of class \code{pglm} containing the following:
  \item{LamOptimised}{A logical indicating whether the fitted lambda has been optimised using \code{pglmEstLambda()}}
  \item{namey}{The name of the y variable.}
 }
-%\references{ ~put references to the literature/web site here ~ }
+\references{R. P. Freckleton, P. H. Harvey, and M. Pagel. Phylogenetic analysis and comparative data: A test and 
+review of evidence. American Naturalist, 160:712–726, 2002.}
 \author{Rob Freckleton; David Orme}
 %\note{}
 \seealso{\code{\link{profile.lambda}} }

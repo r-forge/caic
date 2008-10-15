@@ -489,7 +489,7 @@ pglm <- function(formula, data, phylomat, lambda = 1.0, ...) {
 	
 	logDetV <- determinant(Vmat, logarithm = TRUE)$modulus[1]
  	
-	logLikY <- -n / 2.0 * log( 2 * pi) - n / 2.0 * log(ll$s2) - logDetV / 2.0  - (n - 1 )/ 2.0
+	logLikY <- -n / 2.0 * log( 2 * pi) - n / 2.0 * log( (n - k) * ll$s2 / n) - logDetV / 2.0  - n / 2.0 # using ML estimate of variance - bug spot by Tony Wilson
 	
 	RMS <- ll$s2
 	RSSQ <- ll$s2 * (n - k)
