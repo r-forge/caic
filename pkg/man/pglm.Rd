@@ -87,7 +87,7 @@ Returns an object of class \code{pglm} containing the following:
  \item{namey}{The name of the y variable.}
 }
 \references{R. P. Freckleton, P. H. Harvey, and M. Pagel. Phylogenetic analysis and comparative data: A test and 
-review of evidence. American Naturalist, 160:712–726, 2002.}
+review of evidence. American Naturalist, 160:712-726, 2002.}
 \author{Rob Freckleton; David Orme}
 %\note{}
 \seealso{\code{\link{profile.lambda}} }

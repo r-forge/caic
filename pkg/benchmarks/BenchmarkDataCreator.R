@@ -119,7 +119,6 @@ BenchRich <- matrix(BenchRich, ncol=2, byrow=TRUE)
 BenchRich <- BenchRich[match(BenchData$node, BenchRich[,2]),]
 BenchData$SppRich <- as.numeric(BenchRich[,1])
 
-save(BenchData, BENCH, BENCHPoly, file="Benchmark.Rda")
 write.table(BenchData, file="BenchData.txt", quote=FALSE, sep="\t", row.names=FALSE)
 
 # output files for analysis in Fusco

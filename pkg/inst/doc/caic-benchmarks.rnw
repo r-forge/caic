@@ -16,31 +16,27 @@
 \author{David Orme}
 
 \SweaveOpts{echo=TRUE}
+
 \begin{document}
 
 \maketitle
 
-This file contains details on the benchmark testing of the implementation of various methods in the package against other existing implementations.
 <<echo=FALSE>>=
 options(width=85)
 @
-The main benchmark dataset is  a 200 tip tree grown under a pure-birth, constant-rates model using the \texttt{growTree()} function. Three co-varying continuous variables and a two and a three level categorical variable were evolved on the tree. The details of the code are presented in the file  `BenchmarkDataCreator.R', which details the covariation between the continuous traits and the transition rate matrix for the categorical variables. An extra variable also tests the special case of having no variation in the reference variable at a polytomy. The simulated dichotomous tree has also been degraded to contain a few polytomies. The creator file also handles exporting the data and tree into a form suitable for use in CAIC.
 
 
+This vignette presents benchmark testing of the implementation of various methods in the package against other existing implementations. The output from other implementations have been stored in standard .rda data files in the package `data' directory. Details of the creation of the benchmark data sets and of suitably formatted input files for other program implementations, along with the original outputs and logs of those programs, are held in the `benchmark' directory in the package Subversion repository on http://r-forge.r-project.org.
 
-\section{Benchmarking \texttt{crunch()} and \texttt{brunch()}.}
-
-These benchmarks test the implementation of independent contrast calculations \citep{Felsenstein.1985.a} using the \texttt{crunch()} and \texttt{brunch()} algorithms in the package `CAIC' against the implementations in the Mac Classic program CAIC v2.6.9 \citep{Purvis.Rambaut.1995.a}, running in Mac OS 9.2.2 emulation under Mac OS 10.4.10. 
-
-The benchmark dataset, created using the the file  `BenchmarkDataCreator.R' and saved as `Benchmark.Rda' contains the following objects:
+The main benchmark dataset (`benchTestInputs.rda')  contains the following objects:
 \begin{description}
   \item[\texttt{BENCH}] A 200 tip tree grown under a pure-birth, constant-rates model using the \texttt{growTree()} function. 
-  \item[\texttt{BENCHPCrDi213oly}] A version of the tree in which six polytomies have been created by collapsing the shortest internal branches.
-  \item[\texttt{BenchData}] A data frame of tip data for the trees containing the following variables, either evolved using \texttt{growTree()} or modified from such evolved variables:
+  \item[\texttt{BENCHPoly}] A version of the tree in which six polytomies have been created by collapsing the shortest internal branches.
+  \item[\texttt{BenchData}] A data frame of tip data for the trees containing the following columns, either evolved using \texttt{growTree()} or modified from the evolved variables:
   \begin{description}
     \item[\texttt{node}] Identifies which tip on the tree each row of data relates to.
 	\item[\texttt{contResp, contExp1, contExp2}] Three co-varying continuous variables evolved under Brownian motion along the tree.
-	\item[\texttt{contExp1NoVar}] A version of \texttt{contExp1} which has identical values for five more distal polytomies. This is present to test the behaviour of the implementations at polytomies which have no variation in the reference variable.
+	\item[\texttt{contExp1NoVar}] A version of \texttt{contExp1} which has identical values for five more distal polytomies. This is present to test the behaviour of algorithms at polytomies which have no variation in a variable.
 	\item[\texttt{contRespNA, contExp1NA, contExp2NA}] As above but with a small proportion (\~{}5\%) of missing data.
 	\item[\texttt{biFact, triFact}] A binary and ternary categorical variable evolving under a rate matrix across the tree.
 	\item[\texttt{biFactNA, triFactNA}] As above, but with a small proportion (\~{}5\%) of missing data.
@@ -49,9 +45,14 @@ The benchmark dataset, created using the the file  `BenchmarkDataCreator.R' and 
 \end{description}
 
 
+
+\section{Benchmarking \texttt{crunch()} and \texttt{brunch()}.}
+
+These benchmarks test the implementation of independent contrast calculations \citep{Felsenstein.1985.a} using the \texttt{crunch()} and \texttt{brunch()} algorithms against the implementations in the Mac Classic program CAIC v2.6.9 \citep{Purvis.Rambaut.1995.a}, running in Mac OS 9.2.2 (emulated in Mac OS 10.4.10). 
+
 \subsection{The \texttt{crunch} algorithm}
 
-Five analyses were performed in CAIC to benchmark the following tests:
+Five analyses were performed in CAIC to benchmark the following situations. The numbers in the object names refer to the column numbers in the \texttt{BenchData} data frame.
 \begin{description}
   \item[CrDi213] A dichotomous tree with complete data in three continuous variables.
   \item[CrDi657] A dichotomous tree with incomplete data in three continuous variables.
@@ -60,21 +61,12 @@ Five analyses were performed in CAIC to benchmark the following tests:
   \item[CrPl657] A polytomous tree with incomplete data in three continuous variables.
 \end{description}
 
- The log files `CAIC\_BenchTreeDi.log' and `CAIC\_BenchTreePoly.log' describe the input used to run these analyses in CAIC, with the column numbers used to identify variables using the same order as the variables in the data frame \texttt{BenchData}. The following code loads the output of the CAIC analysis into R. Each of the data frames contains the standard CAIC contrast table consisting of: the CAIC code for the node, the contrast in each variable, the standard deviation of the contrast, the height of the node, the number of subtaxa descending from the node; and the nodal values of the variables.
+These calculations are reproduced below using the \texttt{crunch()} function. Note that the default internal branch length used in calculations at a polytomy (\texttt{polytomy.brlen}) needs to be changed from the 0, which is the default in \texttt{crunch()}, to 1, which was the default in CAIC. The \texttt{caic.table()} function is used to extract a contrast table from the \texttt{crunch()} output, including CAIC style node labels.
 
 <<>>=
-CAIC.CrDi213 <- read.delim("../../benchmarks/CAIC_outputs/BenchCAIC.dat_CrDi213")
-CAIC.CrDi657 <- read.delim("../../benchmarks/CAIC_outputs/BenchCAIC.dat_CrDi657")
-CAIC.CrPl213 <- read.delim("../../benchmarks/CAIC_outputs/BenchCAIC.dat_CrPl213")
-CAIC.CrPl413 <- read.delim("../../benchmarks/CAIC_outputs/BenchCAIC.dat_CrPl413")
-CAIC.CrPl657 <- read.delim("../../benchmarks/CAIC_outputs/BenchCAIC.dat_CrPl657")
-@
-
-The next section of code duplicates these CAIC analyses using the \texttt{crunch()} function. Note that the default internal branch length used in calculations at a polytomy (\texttt{polytomy.brlen}) needs to be changed from the 0, which is the default in \texttt{crunch()}, to 1, which was the default in CAIC. The \texttt{caic.table()} function is used to extract a contrast table from the \texttt{crunch()} output, including CAIC style node labels.
-
-<<>>=
-load("../../benchmarks/Benchmark.Rda")
 library(CAIC)
+data(benchTestInputs)
+
 crunch.CrDi213 <- crunch(contResp ~ contExp1 + contExp2, data=BenchData, phy=BENCH, names.col=node, polytomy.brlen=1)
 crunch.CrDi213.tab <- caic.table(crunch.CrDi213, CAIC.codes=TRUE)
 
@@ -91,61 +83,57 @@ crunch.CrPl657 <- crunch(contRespNA ~ contExp1NA + contExp2NA, data=BenchData, p
 crunch.CrPl657.tab <- caic.table(crunch.CrPl657, CAIC.codes=TRUE)
 @
 
-The CAIC codes can now be used to order the datasets from the two implementations in order to compare the calculated values. The contrasts in the response variable are plotted in Fig. \ref{crunch}, with data from CAIC shown in black and overplotting of data from \texttt{crunch} in red. The range in the differences between these values is shown in Table \ref{crunchDiffs}, where the maximum differences of around $\pm1e-5$ arise from the limited precision of the values saved in the CAIC output. The exceptions occur in the case of variables with no variance at a polytomy --- these values are identical but currently have  opposite signs between the two implementations.
-
-<<>>=
-crunch.CrDi213.tab <- crunch.CrDi213.tab[order(crunch.CrDi213.tab$CAIC.code),]
-crunch.CrDi657.tab <- crunch.CrDi657.tab[order(crunch.CrDi657.tab$CAIC.code),]
-crunch.CrPl213.tab <- crunch.CrPl213.tab[order(crunch.CrPl213.tab$CAIC.code),]
-crunch.CrPl413.tab <- crunch.CrPl413.tab[order(crunch.CrPl413.tab$CAIC.code),]
-crunch.CrPl657.tab <- crunch.CrPl657.tab[order(crunch.CrPl657.tab$CAIC.code),]
-
-CAIC.CrDi213 <- CAIC.CrDi213[order(CAIC.CrDi213$Code),]
-CAIC.CrDi657 <- CAIC.CrDi657[order(CAIC.CrDi657$Code),]
-CAIC.CrPl213 <- CAIC.CrPl213[order(CAIC.CrPl213$Code),]
-CAIC.CrPl413 <- CAIC.CrPl413[order(CAIC.CrPl413$Code),]
-CAIC.CrPl657 <- CAIC.CrPl657[order(CAIC.CrPl657$Code),]
-@
+The outputs of contrast calculations in CAIC are saved as the data frames \texttt{CAIC.CrDi213},\texttt{CAIC.CrDi657},\texttt{CAIC.CrPl213},\texttt{CAIC.CrPl413} and \texttt{CAIC.CrPl657} in the data file \texttt{benchCrunchOutputs.rda}. Each of the data frames contains the standard CAIC contrast table consisting of: the CAIC code for the node, the contrast in each variable, the standard deviation of the contrast, the height of the node, the number of subtaxa descending from the node; and the nodal values of the variables. The CAIC codes can now be used to merge the datasets from the two implementations in order to compare the calculated values. The contrasts in the response variable are plotted in Fig. \ref{crunch}, with data from CAIC shown in black and overplotting of data from \texttt{crunch()} in red. The range in the differences between these values is shown in Table \ref{crunchDiffs}, where the maximum differences of around $\pm1e-5$ arise from the limited precision of the values saved in the CAIC output. The exceptions occur in the case of variables with no variance at a polytomy --- these values are identical but currently have  opposite signs between the two implementations.
 
 \begin{figure}[htbp]
   \begin{center}
 <<echo=FALSE, fig=true, width=6, height=12>>=
+
+data(benchCrunchOutputs)
+
+crunch.CrDi213.tab <- merge(crunch.CrDi213.tab,  CAIC.CrDi213, by.x="CAIC.code", by.y="Code", suffixes=c(".crunch", ".CAIC"))
+crunch.CrDi657.tab <- merge(crunch.CrDi657.tab,  CAIC.CrDi657, by.x="CAIC.code", by.y="Code", suffixes=c(".crunch", ".CAIC"))
+crunch.CrPl213.tab <- merge(crunch.CrPl213.tab,  CAIC.CrPl213, by.x="CAIC.code", by.y="Code", suffixes=c(".crunch", ".CAIC"))
+crunch.CrPl413.tab <- merge(crunch.CrPl413.tab,  CAIC.CrPl413, by.x="CAIC.code", by.y="Code", suffixes=c(".crunch", ".CAIC"))
+crunch.CrPl657.tab <- merge(crunch.CrPl657.tab,  CAIC.CrPl657, by.x="CAIC.code", by.y="Code", suffixes=c(".crunch", ".CAIC"))
+
+
 par(mfrow=c(5,2), mar=c(2,2,1,1), mgp=c(1,0,0), tcl=-.1)
 
-plot(contResp~contExp1, data=CAIC.CrDi213)
-with(crunch.CrDi213.tab, 
-     points(x=contExp1, y=contResp, col="red", pch=3, cex=0.8))
-plot(contResp~contExp2, data=CAIC.CrDi213)
-with(crunch.CrDi213.tab, 
-     points(x=contExp2, y=contResp, col="red", pch=3, cex=0.8))
+plot(contResp.CAIC ~ contExp1.CAIC, data=crunch.CrDi213.tab, xlab="contExp1", ylab="contResp")
+with(crunch.CrDi213.tab, points(x=contExp1.crunch, y=contResp.crunch, col="red", pch=3, cex=0.8))
 
-plot(contRespNA~contExp1NA, data=CAIC.CrDi657)
-with(crunch.CrDi657.tab, 
-     points(x=contExp1NA, y=contRespNA, col="red", pch=3, cex=0.8))
-plot(contRespNA~contExp2NA, data=CAIC.CrDi657)
-with(crunch.CrDi657.tab, 
-     points(x=contExp2NA, y=contRespNA, col="red", pch=3, cex=0.8))
+plot(contResp.CAIC ~ contExp2.CAIC, data=crunch.CrDi213.tab, xlab="contExp2", ylab="contResp")
+with(crunch.CrDi213.tab, points(x=contExp2.crunch, y=contResp.crunch, col="red", pch=3, cex=0.8))
 
-plot(contResp~contExp1, data=CAIC.CrPl213)
-with(crunch.CrPl213.tab, 
-     points(x=contExp1, y=contResp, col="red", pch=3, cex=0.8))
-plot(contResp~contExp2, data=CAIC.CrPl213)
-with(crunch.CrPl213.tab, 
-     points(x=contExp2, y=contResp, col="red", pch=3, cex=0.8))
 
-plot(contResp~contExp1NoVar, data=CAIC.CrPl413)
-with(crunch.CrPl413.tab, 
-     points(x=contExp1NoVar, y=contResp, col="red", pch=3, cex=0.8))
-plot(contResp~contExp2, data=CAIC.CrPl413)
-with(crunch.CrPl413.tab, 
-     points(x=contExp2, y=contResp, col="red", pch=3, cex=0.8))
+plot(contRespNA.CAIC ~ contExp1NA.CAIC, data=crunch.CrDi657.tab, xlab="contExp1NA", ylab="contRespNA")
+with(crunch.CrDi657.tab, points(x=contExp1NA.crunch, y=contRespNA.crunch, col="red", pch=3, cex=0.8))
 
-plot(contRespNA~contExp1NA, data=CAIC.CrPl657)
-with(crunch.CrPl657.tab, 
-     points(x=contExp1NA, y=contRespNA, col="red", pch=3, cex=0.8))
-plot(contRespNA~contExp2NA, data=CAIC.CrPl657)
-with(crunch.CrPl657.tab, 
-     points(x=contExp2NA, y=contRespNA, col="red", pch=3, cex=0.8))
+plot(contRespNA.CAIC ~ contExp2NA.CAIC, data=crunch.CrDi657.tab, xlab="contExp2NA", ylab="contResp")
+with(crunch.CrDi657.tab, points(x=contExp2NA.crunch, y=contRespNA.crunch, col="red", pch=3, cex=0.8))
+
+
+plot(contResp.CAIC ~ contExp1.CAIC, data=crunch.CrPl213.tab, xlab="contExp1", ylab="contResp")
+with(crunch.CrPl213.tab, points(x=contExp1.crunch, y=contResp.crunch, col="red", pch=3, cex=0.8))
+
+plot(contResp.CAIC ~ contExp2.CAIC, data=crunch.CrPl213.tab, xlab="contExp2", ylab="contResp")
+with(crunch.CrPl213.tab, points(x=contExp2.crunch, y=contResp.crunch, col="red", pch=3, cex=0.8))
+
+
+plot(contResp.CAIC ~ contExp1NoVar.CAIC, data=crunch.CrPl413.tab, xlab="contExp1NoVar", ylab="contResp")
+with(crunch.CrPl413.tab, points(x=contExp1NoVar.crunch, y=contResp.crunch, col="red", pch=3, cex=0.8))
+
+plot(contResp.CAIC ~ contExp2.CAIC, data=crunch.CrPl413.tab, xlab="contExp2", ylab="contResp")
+with(crunch.CrPl413.tab, points(x=contExp2.crunch, y=contResp.crunch, col="red", pch=3, cex=0.8))
+
+
+plot(contRespNA.CAIC ~ contExp1NA.CAIC, data=crunch.CrPl657.tab, xlab="contExp1NA", ylab="contRespNA")
+with(crunch.CrPl657.tab, points(x=contExp1NA.crunch, y=contRespNA.crunch, col="red", pch=3, cex=0.8))
+
+plot(contRespNA.CAIC ~ contExp2NA.CAIC, data=crunch.CrPl657.tab, xlab="contExp2NA", ylab="contResp")
+with(crunch.CrPl657.tab, points(x=contExp2NA.crunch, y=contRespNA.crunch, col="red", pch=3, cex=0.8))
+
 
 @
     \caption{Overplotting of results from CAIC (black) and \texttt{crunch()} (red) analyses.}
@@ -157,28 +145,15 @@ with(crunch.CrPl657.tab,
 
 # create a table of the differences 
 diffRangeTab <- data.frame(analysis=c("CrDi213","CrDi657","CrPl213","CrPl413","CrPl657"),
-						V1Min=numeric(5), V1Max=numeric(5), V2Min=numeric(5),
-						V2Max=numeric(5), V3Min=numeric(5), V3Max=numeric(5))
+						RespMin=numeric(5), RespMax=numeric(5), Exp1Min=numeric(5),
+						Exp1Max=numeric(5), Exp2Min=numeric(5), Exp2Max=numeric(5))
 
-diffRangeTab[1, 2:3] <- range(CAIC.CrDi213$contResp - crunch.CrDi213.tab$contResp)
-diffRangeTab[1, 4:5] <- range(CAIC.CrDi213$contExp1 - crunch.CrDi213.tab$contExp1)
-diffRangeTab[1, 6:7] <- range(CAIC.CrDi213$contExp2 - crunch.CrDi213.tab$contExp2)
+diffRangeTab[1, 2:7] <- apply(crunch.CrDi213.tab[,3:5] - crunch.CrDi213.tab[,c(12,11,13)], 2, range)
+diffRangeTab[2, 2:7] <- apply(crunch.CrDi657.tab[,3:5] - crunch.CrDi657.tab[,c(12,11,13)], 2, range)
+diffRangeTab[3, 2:7] <- apply(crunch.CrPl213.tab[,3:5] - crunch.CrPl213.tab[,c(12,11,13)], 2, range)
+diffRangeTab[4, 2:7] <- apply(crunch.CrPl413.tab[,3:5] - crunch.CrPl413.tab[,c(12,11,13)], 2, range)
+diffRangeTab[5, 2:7] <- apply(crunch.CrPl657.tab[,3:5] - crunch.CrPl657.tab[,c(12,11,13)], 2, range)
 
-diffRangeTab[2, 2:3] <- range(CAIC.CrDi657$contRespNA - crunch.CrDi657.tab$contRespNA)
-diffRangeTab[2, 4:5] <- range(CAIC.CrDi657$contExp1NA - crunch.CrDi657.tab$contExp1NA)
-diffRangeTab[2, 6:7] <- range(CAIC.CrDi657$contExp2NA - crunch.CrDi657.tab$contExp2NA)
-
-diffRangeTab[3, 2:3] <- range(CAIC.CrPl213$contResp - crunch.CrPl213.tab$contResp)
-diffRangeTab[3, 4:5] <- range(CAIC.CrPl213$contExp1 - crunch.CrPl213.tab$contExp1)
-diffRangeTab[3, 6:7] <- range(CAIC.CrPl213$contExp2 - crunch.CrPl213.tab$contExp2)
-
-diffRangeTab[4, 2:3] <- range(CAIC.CrPl413$contResp - crunch.CrPl413.tab$contResp)
-diffRangeTab[4, 4:5] <- range(CAIC.CrPl413$contExp1NoVar - crunch.CrPl413.tab$contExp1NoVar)
-diffRangeTab[4, 6:7] <- range(CAIC.CrPl413$contExp2 - crunch.CrPl413.tab$contExp2)
-
-diffRangeTab[5, 2:3] <- range(CAIC.CrPl657$contRespNA - crunch.CrPl657.tab$contRespNA)
-diffRangeTab[5, 4:5] <- range(CAIC.CrPl657$contExp1NA - crunch.CrPl657.tab$contExp1NA)
-diffRangeTab[5, 6:7] <- range(CAIC.CrPl657$contExp2NA - crunch.CrPl657.tab$contExp2NA)
 
 library(xtable)
 
@@ -191,7 +166,7 @@ print(diffRangeTab, include.rownames=FALSE)
 
 \subsection{The \texttt{brunch} algorithm}
 
-Eight analyses were performed in CAIC to benchmark the following tests:
+Eight analyses were performed in CAIC using the `brunch' algorithm to benchmark the following tests:
 \begin{description}
   \item[BrDi813 and BrPl813] A binary factor as the primary variable with two continuous variables on both the dichotomous and polytomous tree.
   \item[BrDi913 and BrPl913] An ordered ternary factor as the primary variable with two continuous variables on both the dichotomous and polytomous tree. 
@@ -199,20 +174,8 @@ Eight analyses were performed in CAIC to benchmark the following tests:
   \item[BrDi1157 and BrPl1157]  A ordered ternary factor and two continuous variables, all with missing data, on both the dichotomous and polytomous tree.
 \end{description}
 
-Again, the log files `CAIC\_BenchTreeDi.log' and `CAIC\_BenchTreePoly.log' describe the input used to run these analyses in CAIC. The following code loads the output of the CAIC analysis into R. Each of the data frames contains the standard CAIC contrast table consisting of: the CAIC code for the node, the contrast in each variable, the standard deviation of the contrast, the height of the node, the number of subtaxa descending from the node; and the nodal values of the variables.
 
-<<>>=
-CAIC.BrDi813  <- read.delim("../../benchmarks/CAIC_outputs/BenchCAIC.dat_BrDi813")
-CAIC.BrDi913  <- read.delim("../../benchmarks/CAIC_outputs/BenchCAIC.dat_BrDi913")
-CAIC.BrDi1057 <- read.delim("../../benchmarks/CAIC_outputs/BenchCAIC.dat_BrDi1057")
-CAIC.BrDi1157 <- read.delim("../../benchmarks/CAIC_outputs/BenchCAIC.dat_BrDi1157")
-CAIC.BrPl813  <- read.delim("../../benchmarks/CAIC_outputs/BenchCAIC.dat_BrPl813")
-CAIC.BrPl913  <- read.delim("../../benchmarks/CAIC_outputs/BenchCAIC.dat_BrPl913")
-CAIC.BrPl1057 <- read.delim("../../benchmarks/CAIC_outputs/BenchCAIC.dat_BrPl1057")
-CAIC.BrPl1157 <- read.delim("../../benchmarks/CAIC_outputs/BenchCAIC.dat_BrPl1157")
-@
-
-The next section of code duplicates these CAIC analyses using the \texttt{brunch()} function. Note that  \texttt{brunch()} does not calculate contrasts at polytomies and the tests using the polytomous tree are to check that the algorithms are drawing the same contrasts from the data.  The \texttt{caic.table()} function is again used to extract a contrast table from the \texttt{brunch()} output.
+These analyses are duplicated below using the \texttt{brunch()} function. Note that  \texttt{brunch()} does not calculate contrasts at polytomies and the tests using the polytomous tree are to check that the algorithms are drawing the same contrasts from the data.  The \texttt{caic.table()} function is again used to extract a contrast table from the \texttt{brunch()} output.
 
 <<>>=
 brunch.BrDi813  <- brunch(contResp ~ binFact + contExp2, data=BenchData, phy=BENCH, names.col=node)
@@ -233,9 +196,14 @@ brunch.BrPl1157 <- brunch(contRespNA ~ triFactNA + contExp2NA, data=BenchData, p
 brunch.BrPl1157.tab <- caic.table(brunch.BrPl1157, CAIC.codes=TRUE)
 @
 
-The CAIC codes can again now be used to order the datasets from the two implementations in order to compare the calculated values. The  contrasts from each test are overplotted in Fig. \ref{brunchbin} and Fig. \ref{brunchtri} and the range in the differences between these values is shown in Table \ref{brunchDiffs}.
+The CAIC codes can again now be used to merge the output of these analyses with the outputs from the original CAIC to compare the calculated values. The  contrasts from each test are overplotted in Fig. \ref{brunchbin} and Fig. \ref{brunchtri} and the range in the differences between these values is shown in Table \ref{brunchDiffs}.
 
-<<>>=
+
+\begin{figure}[htbp]
+  \begin{center}
+<<echo=FALSE, fig=true, width=6, height=9.6>>=
+data(benchBrunchOutputs)
+
 brunch.BrDi813.tab  <- brunch.BrDi813.tab[order(brunch.BrDi813.tab$CAIC.code),]
 brunch.BrDi913.tab  <- brunch.BrDi913.tab[order(brunch.BrDi913.tab$CAIC.code),]
 brunch.BrDi1057.tab <- brunch.BrDi1057.tab[order(brunch.BrDi1057.tab$CAIC.code),]
@@ -253,11 +221,8 @@ CAIC.BrPl813  <- CAIC.BrPl813[order(CAIC.BrPl813$Code),]
 CAIC.BrPl913  <- CAIC.BrPl913[order(CAIC.BrPl913$Code),]
 CAIC.BrPl1057 <- CAIC.BrPl1057[order(CAIC.BrPl1057$Code),]
 CAIC.BrPl1157 <- CAIC.BrPl1157[order(CAIC.BrPl1157$Code),]
-@
 
-\begin{figure}[htbp]
-  \begin{center}
-<<echo=FALSE, fig=true, width=6, height=9.6>>=
+
 par(mfrow=c(4,2), mar=c(2,2,1,1), mgp=c(1,0,0), tcl=-.1)
 
 plot(contResp ~ binFact, data=CAIC.BrDi813)
@@ -359,7 +324,7 @@ print(diffRangeTab, include.rownames=FALSE)
 
 \section{Benchmarking \texttt{macrocaic()}.}
 
-The function \texttt{macrocaic()} is a re-implementation of the program `MacroCAIC' \citep{Agapow.Isaac.2002.a}, which calculates standard contrasts \citep{Felsenstein.1985.a} for the explanatory variables but alternative contrasts in clade species richness for the explanatory variable. The program calculates two species richness contrast types which are included in the output file. Thes are `PDI', the proportion dominance index, and `RRD', the relative rate difference  \citep{Agapow.Isaac.2002.a}. The benchmark tests included 8 sets of analyses using all combinations of the following:
+The function \texttt{macrocaic()} is a re-implementation of the program `MacroCAIC' \citep{Agapow.Isaac.2002.a}, which calculates standard `crunch' contrasts \citep{Felsenstein.1985.a} for the explanatory variables but species richness contrasts for the response variable. The program calculates two species richness contrast types which are included in the output file. These are `PDI', the proportion dominance index, and `RRD', the relative rate difference \citep{Agapow.Isaac.2002.a}. The benchmark tests included 8 sets of analyses using all combinations of the following:
 
 \begin{description}
 \item[Di/Poly] The benchmark tree used: either dichotomous or polytomous.
@@ -367,26 +332,16 @@ The function \texttt{macrocaic()} is a re-implementation of the program `MacroCA
 \item[23/67] The completeness of the explanatory data used, where 2 and 3 are two complete continuous variables and the variables in 6 and 7 have missing data.
 \end{description}
 
-The results from the original program are read in by the following code, sorted by the CAIC codes for the internal nodes and assigned to objects of the form `MacroCAIC.DiSpp23'. The original `MacroCAIC' log files from these analyses are concatenated together in the file `MacroCAIC\_bench.log'.
+These analyses are repeated below using the function \texttt{macrocaic()}. The resulting contrasts are overplotted on the outputs from `MacroCAIC' for both RRD and PDI using complete and incomplete data (Figs. \ref{RRDComp},\ref{RRDMiss}, \ref{PDIComp},\ref{PDIMiss}). Again, the differences between the contrasts calculated at each node by each implementation are shown in Table \ref{MacroCAICTab}.
 
 <<>>=
+data(benchMacroCAICOutputs)
+
+BenchData$TipsAsSpecies <- rep(1, 200) #$
+
 combos <- expand.grid(c("Di","Poly"), c("Spp","Tax"), c("23","67"))
 comboNames <- apply(combos,1, paste, collapse="")
 
-for(cm in comboNames){
-	objName <- paste("MacroCAIC", cm, sep=".")
-	fName <- paste("../../benchmarks/MacroCAIC_outputs/", cm,".txt", sep="")
-	MacroCAICTab <- read.delim(fName)
-	MacroCAICTab <- MacroCAICTab[order(MacroCAICTab$Code),] #$
-	
-	assign(objName, MacroCAICTab)
-}
-@
-
-The next section of code repeats each of these analyses using the function \texttt{macrocaic()} and then sorts the contrasts from the two implementations into the same order. The resulting contrasts are overplotted on the outputs from `MacroCAIC' for both RRD and PDI using complete and incomplete data (Figs. \ref{RRDComp},\ref{RRDMiss}, \ref{PDIComp},\ref{PDIMiss}). Again, the differences between the contrasts calculated at each node by each implementation are shown in Table \ref{MacroCAICTab}.
-
-<<>>=
-BenchData$TipsAsSpecies <- rep(1, 200) #$
 
 for(cm in seq(along=combos[,1])){
 
@@ -543,30 +498,7 @@ print(MacroCAICTab, include.rownames=FALSE)
 \section{Benchmarking \texttt{fusco.test()}.}
 
 \subsection{Testing against the original FUSCO implementation.}
-This runs tests against Giuseppe Fusco's implementation of the phylogenetic imbalance statistic $I$ \citep{Fusco.Cronk.1995.a}. The original package consists of two DOS programs `IMB\_CALC' and `NULL\_MDL' which calculate the imbalance of phylogeny and then the expected distribution of imbalance values on a equal rates Markov tree, given the size of the tree. The program contains the option to consider the imbalance of the topology, treating each tip as a species, or of the distribution of species across tips, treating each tip as a taxon of one or more species. Each output file in the `benchmarks' folder contains the binned distribution data across nodes, some summary data for the tree and then the individual node calculations. These benchmark tests use both options on both the dichotomous and polytomous benchmark trees. The following code loads the benchmark outputs:
-
-<<>>=
-readFuscoOut <- function(fname){
-
-	distTab <- read.table(fname, skip=3, nrows=10, sep="|")
-	distTab <- distTab[, -c(1,6)]
-	colnames(distTab) <- c("imbalanceBin","obsFreq","corr","corrFreq")
-
-	distSum <- as.list(scan(fname, skip=15, n=10, what=list(NULL,1), sep="=")[[2]])
-	names(distSum) <- c("nSpp","nTips","nInfNodes","medianI","qdI")
-
-	nodes <- read.table(fname, skip=24, sep="|")
-	nodes <- nodes[,-c(1,7)]
-	colnames(nodes) <- c("node","nodeT","nodeB","nodeS","nodeI")
-
-	return(list(distTab=distTab, distSum=distSum, nodes=nodes))
-}
-
-FuscoDiSpp <- readFuscoOut("../../benchmarks/FUSCO_outputs/FuscoDiSpp.txt")
-FuscoDiTax <- readFuscoOut("../../benchmarks/FUSCO_outputs/FuscoDiTax.txt")
-FuscoPolySpp <- readFuscoOut("../../benchmarks/FUSCO_outputs/FuscoPolySpp.txt")
-FuscoPolyTax <- readFuscoOut("../../benchmarks/FUSCO_outputs/FuscoPolyTax.txt")
-@
+This runs tests against Giuseppe Fusco's implementation of the phylogenetic imbalance statistic $I$ \citep{Fusco.Cronk.1995.a}. The original package consists of two DOS programs `IMB\_CALC' and `NULL\_MDL' which calculate the imbalance of phylogeny and then the expected distribution of imbalance values on a equal rates Markov tree, given the size of the tree. The program contains the option to consider the imbalance of the topology, treating each tip as a species, or of the distribution of species across tips, treating each tip as a taxon of one or more species. These benchmark tests used both options on both the dichotomous and polytomous benchmark trees. The data provided in the \texttt{benchFuscoOutputs} dataset contains, for each combination,  a list containing a dataframe of the binned distribution data across nodes, a list of summary data for the tree and then a data frame of the individual node calculations.
 
 The following code duplicates these analyses using the \texttt{fusco.test} function. Summary statistics comparing the two implementations are then show in Table \ref{fuscoVals}. Note that the median and quartile deviation of $I$ in the summary information produced by `IMB\_CALC' and included in the benchmark files are \emph{not directly reproducible} using \texttt{fusco.test}.  However, the values presented here are medians and quartile deviations calculated in R directly from the node table generated by `IMB\_CALC'. The corrected nodal distributions of the original $I$ statistic \citep{Fusco.Cronk.1995.a}, calculated using the \texttt{plot} method, are shown plotted over the values from `IMB\_CALC' in Fig. \ref{fuscoPlots}.
 
@@ -583,6 +515,9 @@ fstest.PolyTax.Hist <- plot(fstest.PolyTax, I.prime=FALSE, plot=FALSE)
 @
 
 <<echo=FALSE, print=FALSE, results=tex>>=
+
+data(benchFuscoOutputs)
+
 # create a table of the differences 
 fuscoTab <- data.frame(analysis=I(c("FuscoDiSpp","fstest.DiSpp","FuscoDiTax","fstest.DiTax",
 						"FuscoPolySpp","fstest.PolySpp","FuscoPolyTax","fstest.PolyTax")),
@@ -629,7 +564,6 @@ for(tst in 1:4){
 	                 correctedFrequency, code=3, ang=90, len=0.05))
 }
 
-
 @
     \caption{Histograms of nodal imbalance values from the program `IMB\_CALC' (grey bars) showing the corresponding values calculated using \texttt{fusco.test} in black.}
     \label{fuscoPlots}
@@ -637,29 +571,15 @@ for(tst in 1:4){
 \end{figure}
 
 \subsection{Testing against the extended implementation ($I, I', I_w$)in MeSA.}
-The original $I$ imbalance statistic showed a bias related to node size, demonstrated and corrected by \citet{Purvis.Katzourakis.ea.2002.a}. This revised calculation using either weights ($I_w$) or a modification to the calculation ($I'$) was implemented in the program MeSA (Agapow, 2006). The following code loads output from MeSA v1.9.23 running under Mac OS 10.5.3, repeating the calculations in \citet{Purvis.Katzourakis.ea.2002.a} of weights, $I$ and $I'$ on a genus-level tree of the Syrphidae.
+The original $I$ imbalance statistic showed a bias related to node size, demonstrated and corrected by \citet{Purvis.Katzourakis.ea.2002.a}. This revised calculation using either weights ($I_w$) or a modification to the calculation ($I'$) was implemented in the program MeSA (Agapow, 2006). The dataset \texttt{benchMesaOutputs} contains the output from MeSA v1.9.23 running under Mac OS 10.5.3, repeating the calculations in \citet{Purvis.Katzourakis.ea.2002.a} of weights, $I$ and $I'$ on a genus-level tree of the Syrphidae. These calculations are repeated using \texttt{fusco.test} and the calculated mean values for both the original $I$ and $I'$ from both implementations are shown.
 
 <<>>=
-MeSA.I <- scan("../../benchmarks/MeSA_outputs/MeSA_FuscoI.txt", sep="\n", what="character")
-MeSA.I <- strsplit(MeSA.I, split="\t")
-MeSA.I <- lapply(MeSA.I, function(X)X[-1:-2])
-MeSA.I <- as.data.frame(MeSA.I, stringsAsFactors=FALSE)[,c(-5,-7)]
-names(MeSA.I) <- c("clade","I","weight","nodeSize","Iprime")
-MeSA.I$I <- as.numeric(MeSA.I$I)
-MeSA.I$weight <- as.numeric(MeSA.I$weight)
-MeSA.I$nodeSize <- as.numeric(MeSA.I$nodeSize)
-MeSA.I$Iprime <- as.numeric(MeSA.I$Iprime)
-@
+data(syrphidae)
 
-The next code block replicates these calculations using \texttt{fusco.test} and displays the calculated mean values for both the original $I$ and $I'$ from both implementations.
-
-<<>>=
-syrphTree <- read.nexus("../../benchmarks/syrphidae.nexus")
-syrphRich <- read.delim("../../benchmarks/syrphidae_tabbed.txt", header=FALSE, col.names=c("genus","nSpp"))
-
-fstest.Syrph <- fusco.test(syrphTree, dat=syrphRich, rich=nSpp, names=genus)
+fstest.Syrph <- fusco.test(syrphidaeTree, dat=syrphidaeRich, rich=nSpp, names=genus)
 summary(fstest.Syrph)
 
+data(benchMesaOutputs)
 mean(MeSA.I$Iprime)
 median(MeSA.I$I)
 @
@@ -668,3 +588,4 @@ median(MeSA.I$I)
 \bibliography{CAIC_refs}
 
 \end{document}
+
