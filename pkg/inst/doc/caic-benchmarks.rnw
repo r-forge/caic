@@ -63,17 +63,17 @@ Five analyses were performed in CAIC to benchmark the following tests:
  The log files `CAIC\_BenchTreeDi.log' and `CAIC\_BenchTreePoly.log' describe the input used to run these analyses in CAIC, with the column numbers used to identify variables using the same order as the variables in the data frame \texttt{BenchData}. The following code loads the output of the CAIC analysis into R. Each of the data frames contains the standard CAIC contrast table consisting of: the CAIC code for the node, the contrast in each variable, the standard deviation of the contrast, the height of the node, the number of subtaxa descending from the node; and the nodal values of the variables.
 
 <<>>=
-CAIC.CrDi213 <- read.delim("benchmarks/CAIC_outputs/BenchCAIC.dat_CrDi213")
-CAIC.CrDi657 <- read.delim("benchmarks/CAIC_outputs/BenchCAIC.dat_CrDi657")
-CAIC.CrPl213 <- read.delim("benchmarks/CAIC_outputs/BenchCAIC.dat_CrPl213")
-CAIC.CrPl413 <- read.delim("benchmarks/CAIC_outputs/BenchCAIC.dat_CrPl413")
-CAIC.CrPl657 <- read.delim("benchmarks/CAIC_outputs/BenchCAIC.dat_CrPl657")
+CAIC.CrDi213 <- read.delim("../../benchmarks/CAIC_outputs/BenchCAIC.dat_CrDi213")
+CAIC.CrDi657 <- read.delim("../../benchmarks/CAIC_outputs/BenchCAIC.dat_CrDi657")
+CAIC.CrPl213 <- read.delim("../../benchmarks/CAIC_outputs/BenchCAIC.dat_CrPl213")
+CAIC.CrPl413 <- read.delim("../../benchmarks/CAIC_outputs/BenchCAIC.dat_CrPl413")
+CAIC.CrPl657 <- read.delim("../../benchmarks/CAIC_outputs/BenchCAIC.dat_CrPl657")
 @
 
 The next section of code duplicates these CAIC analyses using the \texttt{crunch()} function. Note that the default internal branch length used in calculations at a polytomy (\texttt{polytomy.brlen}) needs to be changed from the 0, which is the default in \texttt{crunch()}, to 1, which was the default in CAIC. The \texttt{caic.table()} function is used to extract a contrast table from the \texttt{crunch()} output, including CAIC style node labels.
 
 <<>>=
-load("benchmarks/Benchmark.Rda")
+load("../../benchmarks/Benchmark.Rda")
 library(CAIC)
 crunch.CrDi213 <- crunch(contResp ~ contExp1 + contExp2, data=BenchData, phy=BENCH, names.col=node, polytomy.brlen=1)
 crunch.CrDi213.tab <- caic.table(crunch.CrDi213, CAIC.codes=TRUE)
@@ -202,14 +202,14 @@ Eight analyses were performed in CAIC to benchmark the following tests:
 Again, the log files `CAIC\_BenchTreeDi.log' and `CAIC\_BenchTreePoly.log' describe the input used to run these analyses in CAIC. The following code loads the output of the CAIC analysis into R. Each of the data frames contains the standard CAIC contrast table consisting of: the CAIC code for the node, the contrast in each variable, the standard deviation of the contrast, the height of the node, the number of subtaxa descending from the node; and the nodal values of the variables.
 
 <<>>=
-CAIC.BrDi813  <- read.delim("benchmarks/CAIC_outputs/BenchCAIC.dat_BrDi813")
-CAIC.BrDi913  <- read.delim("benchmarks/CAIC_outputs/BenchCAIC.dat_BrDi913")
-CAIC.BrDi1057 <- read.delim("benchmarks/CAIC_outputs/BenchCAIC.dat_BrDi1057")
-CAIC.BrDi1157 <- read.delim("benchmarks/CAIC_outputs/BenchCAIC.dat_BrDi1157")
-CAIC.BrPl813  <- read.delim("benchmarks/CAIC_outputs/BenchCAIC.dat_BrPl813")
-CAIC.BrPl913  <- read.delim("benchmarks/CAIC_outputs/BenchCAIC.dat_BrPl913")
-CAIC.BrPl1057 <- read.delim("benchmarks/CAIC_outputs/BenchCAIC.dat_BrPl1057")
-CAIC.BrPl1157 <- read.delim("benchmarks/CAIC_outputs/BenchCAIC.dat_BrPl1157")
+CAIC.BrDi813  <- read.delim("../../benchmarks/CAIC_outputs/BenchCAIC.dat_BrDi813")
+CAIC.BrDi913  <- read.delim("../../benchmarks/CAIC_outputs/BenchCAIC.dat_BrDi913")
+CAIC.BrDi1057 <- read.delim("../../benchmarks/CAIC_outputs/BenchCAIC.dat_BrDi1057")
+CAIC.BrDi1157 <- read.delim("../../benchmarks/CAIC_outputs/BenchCAIC.dat_BrDi1157")
+CAIC.BrPl813  <- read.delim("../../benchmarks/CAIC_outputs/BenchCAIC.dat_BrPl813")
+CAIC.BrPl913  <- read.delim("../../benchmarks/CAIC_outputs/BenchCAIC.dat_BrPl913")
+CAIC.BrPl1057 <- read.delim("../../benchmarks/CAIC_outputs/BenchCAIC.dat_BrPl1057")
+CAIC.BrPl1157 <- read.delim("../../benchmarks/CAIC_outputs/BenchCAIC.dat_BrPl1157")
 @
 
 The next section of code duplicates these CAIC analyses using the \texttt{brunch()} function. Note that  \texttt{brunch()} does not calculate contrasts at polytomies and the tests using the polytomous tree are to check that the algorithms are drawing the same contrasts from the data.  The \texttt{caic.table()} function is again used to extract a contrast table from the \texttt{brunch()} output.
@@ -375,7 +375,7 @@ comboNames <- apply(combos,1, paste, collapse="")
 
 for(cm in comboNames){
 	objName <- paste("MacroCAIC", cm, sep=".")
-	fName <- paste("benchmarks/MacroCAIC_outputs/", cm,".txt", sep="")
+	fName <- paste("../../benchmarks/MacroCAIC_outputs/", cm,".txt", sep="")
 	MacroCAICTab <- read.delim(fName)
 	MacroCAICTab <- MacroCAICTab[order(MacroCAICTab$Code),] #$
 	
@@ -562,10 +562,10 @@ readFuscoOut <- function(fname){
 	return(list(distTab=distTab, distSum=distSum, nodes=nodes))
 }
 
-FuscoDiSpp <- readFuscoOut("benchmarks/FUSCO_outputs/FuscoDiSpp.txt")
-FuscoDiTax <- readFuscoOut("benchmarks/FUSCO_outputs/FuscoDiTax.txt")
-FuscoPolySpp <- readFuscoOut("benchmarks/FUSCO_outputs/FuscoPolySpp.txt")
-FuscoPolyTax <- readFuscoOut("benchmarks/FUSCO_outputs/FuscoPolyTax.txt")
+FuscoDiSpp <- readFuscoOut("../../benchmarks/FUSCO_outputs/FuscoDiSpp.txt")
+FuscoDiTax <- readFuscoOut("../../benchmarks/FUSCO_outputs/FuscoDiTax.txt")
+FuscoPolySpp <- readFuscoOut("../../benchmarks/FUSCO_outputs/FuscoPolySpp.txt")
+FuscoPolyTax <- readFuscoOut("../../benchmarks/FUSCO_outputs/FuscoPolyTax.txt")
 @
 
 The following code duplicates these analyses using the \texttt{fusco.test} function. Summary statistics comparing the two implementations are then show in Table \ref{fuscoVals}. Note that the median and quartile deviation of $I$ in the summary information produced by `IMB\_CALC' and included in the benchmark files are \emph{not directly reproducible} using \texttt{fusco.test}.  However, the values presented here are medians and quartile deviations calculated in R directly from the node table generated by `IMB\_CALC'. The corrected nodal distributions of the original $I$ statistic \citep{Fusco.Cronk.1995.a}, calculated using the \texttt{plot} method, are shown plotted over the values from `IMB\_CALC' in Fig. \ref{fuscoPlots}.
@@ -640,7 +640,7 @@ for(tst in 1:4){
 The original $I$ imbalance statistic showed a bias related to node size, demonstrated and corrected by \citet{Purvis.Katzourakis.ea.2002.a}. This revised calculation using either weights ($I_w$) or a modification to the calculation ($I'$) was implemented in the program MeSA (Agapow, 2006). The following code loads output from MeSA v1.9.23 running under Mac OS 10.5.3, repeating the calculations in \citet{Purvis.Katzourakis.ea.2002.a} of weights, $I$ and $I'$ on a genus-level tree of the Syrphidae.
 
 <<>>=
-MeSA.I <- scan("benchmarks/MeSA_outputs/MeSA_FuscoI.txt", sep="\n", what="character")
+MeSA.I <- scan("../../benchmarks/MeSA_outputs/MeSA_FuscoI.txt", sep="\n", what="character")
 MeSA.I <- strsplit(MeSA.I, split="\t")
 MeSA.I <- lapply(MeSA.I, function(X)X[-1:-2])
 MeSA.I <- as.data.frame(MeSA.I, stringsAsFactors=FALSE)[,c(-5,-7)]
@@ -654,8 +654,8 @@ MeSA.I$Iprime <- as.numeric(MeSA.I$Iprime)
 The next code block replicates these calculations using \texttt{fusco.test} and displays the calculated mean values for both the original $I$ and $I'$ from both implementations.
 
 <<>>=
-syrphTree <- read.nexus("benchmarks/syrphidae.nexus")
-syrphRich <- read.delim("benchmarks/syrphidae_tabbed.txt", header=FALSE, col.names=c("genus","nSpp"))
+syrphTree <- read.nexus("../../benchmarks/syrphidae.nexus")
+syrphRich <- read.delim("../../benchmarks/syrphidae_tabbed.txt", header=FALSE, col.names=c("genus","nSpp"))
 
 fstest.Syrph <- fusco.test(syrphTree, dat=syrphRich, rich=nSpp, names=genus)
 summary(fstest.Syrph)
