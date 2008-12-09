@@ -18,13 +18,20 @@ function(vals, phy, ref.var, picMethod, crunch.brlen){
     # DESIGN THOUGHTS - simpler to maintain with a single function for each type of contrast
     #                 - create an initialize function to do these shared first steps?
     
+    # 13/12/08 - added code to keep track of node depth. Cheap to do whilst traversing the tree for contrasts
+    #            and avoids having to use the currently rather expensive node2tip (uses clade.matrix)
+    
     Root <-  with(phy, (max(edge)-Nnode)+1)
     IntNd <- Root:max(phy$edge) 
     nIntNd <- phy$Nnode
 
     contrMat <- matrix(NA, ncol=dim(vals)[2], nrow=nIntNd, dimnames=list(IntNd, dimnames(vals)[[2]]))
     nodVal <- rbind(vals, contrMat)
-
+    
+    # node depth vector
+    nodeDepth <- rep(c(1,NA), times=c(length(phy$tip.label), nIntNd))
+    names(nodeDepth) <- rownames(nodVal)
+    
     # vector of number of children and variance used in calculation
     nChild <- numeric(nIntNd)
     names(nChild) <- IntNd
@@ -316,9 +323,16 @@ function(vals, phy, ref.var, picMethod, crunch.brlen){
         parInd <- with(phy, match(parent, edge[,2]))
         if(! parent == Root){
                 phy$edge.length[parInd] <- phy$edge.length[parInd] + currBlAdj}
+                
+       # track the node depth of  nodes with contrasts
+       if(sum(compChild) < 2){ # i.e. a node with data for one tip being passed through or with no data
+           nodeDepth[parent] <- max(nodeDepth[children])
+       } else { # a contrast has been calculated and this node has a greater depth
+           nodeDepth[parent] <- max(nodeDepth[children]) + 1 
+       }
     }
 
-    RET <- list(contrMat=contrMat, nodVal=nodVal, var.contr=contrVar, nChild=nChild) 
+    RET <- list(contrMat=contrMat, nodVal=nodVal, var.contr=contrVar, nChild=nChild, nodeDepth=nodeDepth) 
     attr(RET, "contr.type") <- picMethod
 
     return(RET)

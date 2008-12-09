@@ -183,20 +183,24 @@ function(formula, data, phy, names.col, stand.contr = TRUE, ref.var=NULL, node.d
         ContrObj$nodalVals$explanatory <- contr$nodVal[as.numeric(rownames(contr$nodVal)) >= root,-1,drop=FALSE]            
         ContrObj$contrVar <- contr$var.contr
         ContrObj$nChild <- contr$nChild
+        ContrObj$nodeDepth <- contr$nodeDepth[as.numeric(names(contr$nodeDepth)) >= root]
         
+        ## THE NEXT SECTION WAS FAR TOO SLOW AND FAR TOO MEMORY HUNGRY WITH BIG TREES
+        ##  - NODE DEPTH CALCULATIONS (FILTERING NODES WHERE NO CONTRASTS ARE CALCULATED)
+        ##    ARE NOW WRITTEN INTO THE TREE TRAVERSAL OF contrCalc SO SHOULD BE FAR MORE EFFICIENT!
         
-        # get the node depth using the tree for which we have complete data
-        # and then match those nodes up against the analysis tree
-        tipsWithNAdata <- tipLabs[! complete.cases(mf)]
-        if(length(tipsWithNAdata) > 0){
-        	compPhy <- drop.tip(analysisPhy, tipsWithNAdata) 
-    	}	else { compPhy <- analysisPhy }
+        ##  # get the node depth using the tree for which we have complete data
+        ##  # and then match those nodes up against the analysis tree
+        ##  tipsWithNAdata <- tipLabs[! complete.cases(mf)]
+        ##  if(length(tipsWithNAdata) > 0){
+        ##  	compPhy <- drop.tip(analysisPhy, tipsWithNAdata) 
+    	##  }	else { compPhy <- analysisPhy }
     	
-
-		nd <- node2tip(compPhy) # slow because it uses clade matrix
-		names(nd) <- with( compPhy, c(tip.label, node.label))
-        nd <- nd[match(analysisPhy$node.label, names(nd))]
-        ContrObj$nodeDepth <- nd
+		## nd <- node2tip(compPhy) # slow because it uses clade matrix
+		## names(nd) <- with( compPhy, c(tip.label, node.label))
+        ## nd <- nd[match(analysisPhy$node.label, names(nd))]
+        ## ContrObj$nodeDepth <- nd
+        
         
         # gather the row ids of NA nodes to drop from the model
         validNodes <- with(ContrObj$contr, complete.cases(explanatory) & complete.cases(response))
