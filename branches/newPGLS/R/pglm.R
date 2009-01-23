@@ -444,6 +444,7 @@ pglm <- function(formula, data, V, lambda = 1.0, kappa = 1.0,  delta= 1.0, contr
 		n <- length(x[,1])
 		logDetV <- determinant(V, logarithm = TRUE)$modulus[1]
 		ll <- -n / 2.0 * log( 2 * pi) - n / 2.0 * log(s2) - logDetV / 2.0 - (n - 1)/2.0
+
 		ypred <- x%*%mu	
 
 		# if being used for optimization, only return the log likelihood
@@ -536,9 +537,9 @@ pglm <- function(formula, data, V, lambda = 1.0, kappa = 1.0,  delta= 1.0, contr
 	fm <- list(coef = coeffs, aic = aic, log.lik = log.lik)
 	
 	logDetV <- determinant(V, logarithm = TRUE)$modulus[1]
- 	
-	logLikY <- -n / 2.0 * log( 2 * pi) - n / 2.0 * log(ll$s2) - logDetV / 2.0  - (n - 1 )/ 2.0
 	
+	logLikY <- -n / 2.0 * log( 2 * pi) - n / 2.0 * log( (n - k) * ll$s2 / n) - logDetV / 2.0  - n / 2.0
+
 	RMS <- ll$s2
 	RSSQ <- ll$s2 * (n - k)
 	NMS <- RMS

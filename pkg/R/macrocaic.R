@@ -120,7 +120,12 @@ function(formula, data, phy, names.col, macroMethod = "RRD", stand.contr = TRUE,
         macroMf <- as.matrix(model.response(initMf))
         colnames(macroMf) <- with(attributes(attr(initMf, "terms")), rownames(factors)[response])
         if(any(is.na(macroMf))) stop("MacroCAIC analyses cannot have missing species richness values")
+        if(any(macroMf <= 0)) stop("Species richness values cannot be negative or zero")
         
+        if(any((macroMf %% 1) > 0)) {
+            macroMf <- floor(macroMf)
+            warning("Non-integer species richness values present: data have been rounded down to the nearest integer")
+        }
         
     # CALCULATE MODEL 
     # GET THE MODEL MATRIX and Model Response
