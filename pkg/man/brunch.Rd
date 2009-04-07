@@ -1,7 +1,7 @@
 \name{brunch}
 \alias{brunch}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{Comparative analysis using the crunch algorithm.}
+\title{Comparative analysis using the brunch algorithm.}
 \description{
 Calculate a linear model using the brunch algorithm.
 }
@@ -22,7 +22,7 @@ brunch(formula, data, phy, names.col, stand.contr = TRUE, ref.var=NULL, node.dep
 }
 
 \details{
-This function implements the 'brunch' algorithm for modelling the relationship between variables that are phylogenetically non-independent. [The method was first described by Felsenstein (1985) and subsequently extended to permit the use of phylogenies with polytomies by Pagel (1992) - correct this...]. This method was previously implemented in the Mac Classic computer programs CAIC, written by Andy Purvis, Andy Rambaut (Purvis and Rambaut, 1995) and updated by Nick Isaac and Paul-Michael Agapow.
+This function implements the 'brunch' algorithm for modelling the relationship between variables that are phylogenetically non-independent. [The method was first described by Felsenstein (1985) and subsequently extended to permit the use of phylogenies with polytomies by Pagel (1992) - correct this...]. This method was previously implemented in the Mac Classic computer programs CAIC, written by Purvis and Rambaut (1995) and updated by Nick Isaac and Paul-Michael Agapow.
 
 The user provides a data frame and a phylogeny. These are matched using \code{names.col} to identify a column in the data frame that contains tip labels on the phylogeny. The formula specifies the model to be fitted and contrasts are calculated in those variables. The specified reference variable is used to ensure that contrasts for multivariate models are calculated in a consistent direction at each node. The function \code{caic} acts as a data preparation wrapper, finding the union between the phylogeny and data and reducing the dataset to the correct model and response matrices. The prepared data is then sent to the \code{contrCalc} engine, which is not intended to be called by users.
 
