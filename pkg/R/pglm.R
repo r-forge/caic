@@ -24,6 +24,38 @@
 ## #
 
 
+## prune.single has been made redundant by expanding the existing order.D and order.V and adding code to lik.lambda
+
+## prune.single <- function(x, data, V) {
+## 
+## 	dat <- data.frame(V1 = x, row.names=rownames(dat))
+## 
+## 	nms <- row.names(dat)
+## 	if(length(nms) == 0) stop("Need to supply row names for the data")
+## 	idx <- sort(nms, index.return = TRUE)$ix
+## 	sort.nms <- sort(nms, index.return = TRUE)$x
+## 	dat <- dat[idx,]
+## 	Vnms <- row.names(V)
+## 	if(length(Vnms) == 0) stop("Need to supply row names for the Variance matrix")
+## 	idx <- sort(Vnms, index.return = TRUE)$ix
+## 	V <- V[idx, idx]
+## 	
+## 	nms <- sort(nms)
+## 	Vn <- sort(row.names(V))
+## 	idx <- which(nms != Vn)
+## 	
+## 	
+## 	if(length(idx) > 0) stop("Error, taxon names do not match")
+## 	
+## 	complete <- complete.cases(dat)
+## 	idx <- which(complete == TRUE)
+## 	V <- V[idx, idx]
+## 	x <- dat[idx]
+## 	sort.prune.names <- sort.nms[idx]
+## 	dat <- data.frame(V1 = x, row.names = sort.prune.names)
+## 
+## 	return(list(dat = dat , V = V))
+## }
 
 lik.lambda <- function(x, V, data=NULL, lambda) {
 	
@@ -284,47 +316,10 @@ max.lik.kappa <- function(x, V){
 
 lam.test.single <- function(x, data, V, pretty=TRUE) {
 
-    ## prune.single has been made redundant by expanding the existing order.D and order.V and adding code to lik.lambda
-    ## re-instated within lam.test.single until the code is better structured.
-    prune.single <- function(x, data, V) {
-
-    	dat <- data.frame(V1 = x, row.names=rownames(dat))
-
-    	nms <- row.names(dat)
-    	if(length(nms) == 0) stop("Need to supply row names for the data")
-    	idx <- sort(nms, index.return = TRUE)$ix
-    	sort.nms <- sort(nms, index.return = TRUE)$x
-    	dat <- dat[idx,]
-    	Vnms <- row.names(V)
-    	if(length(Vnms) == 0) stop("Need to supply row names for the Variance matrix")
-    	idx <- sort(Vnms, index.return = TRUE)$ix
-    	V <- V[idx, idx]
-	
-    	nms <- sort(nms)
-    	Vn <- sort(row.names(V))
-    	idx <- which(nms != Vn)
-	
-	
-    	if(length(idx) > 0) stop("Error, taxon names do not match")
-	
-    	complete <- complete.cases(dat)
-    	idx <- which(complete == TRUE)
-    	V <- V[idx, idx]
-    	x <- dat[idx]
-    	sort.prune.names <- sort.nms[idx]
-    	dat <- data.frame(V1 = x, row.names = sort.prune.names)
-
-    	return(list(dat = dat , V = V))
-    }
-
-	prune.dat <- prune.single(x, data, V)
-	
-	Vmat <- prune.dat$V
-	data <- prune.dat$dat
-
-	ml.lam <- maxLik.lambda(data[,1], Vmat, data)
-	lam0 <- lik.lambda(data[,1], Vmat, data, 0)
-	lam1 <- lik.lambda(data[,1], Vmat, data, 1)
+	# currently inefficient - since it sorts the data out three times
+	ml.lam <- maxLik.lambda(x, V, data)
+	lam0 <- lik.lambda(x, V, data, 0)
+	lam1 <- lik.lambda(x, V, data, 1)
 	
 	lrt0 <- 2 * (-ml.lam$objective - lam0$ll)
 	lrt1 <- 2 * (-ml.lam$objective - lam1$ll)
