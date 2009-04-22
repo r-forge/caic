@@ -33,12 +33,12 @@ For the random expectation, trait values are randomly shuffled along the tips of
 }
 \value{
 Returns an object of class 'phylo.d', which is a list of the following:
-\item{DEstimate} {The estimated D value}
-\item{Pval1} {A p value, giving the result of testing whether D is significantly different from one}
-\item{Pval0} {A p value, giving the result of testing whether D is significantly different from zero}
-\item{Parameters} {A list of the Observed, MeanRandom and MeanBrownian sums of sister-clade differences}
-\item{Permutations} {A list with elements random and brownian, containing the sums of sister-clade differences from random permutations and simulations of Brownian evolution under a threshold model}
-\item{NodalVals} {A list with elements observed, random and brownian, containing the nodal values estimated for the observed trait (as a numeric with names that correspond to node numbers in the phylo object) and those estimated in the permutations (as dataframes with a column for each node, named e.g. X17 for node 17)}
+\item{DEstimate}{The estimated D value}
+\item{Pval1}{A p value, giving the result of testing whether D is significantly different from one}
+\item{Pval0}{A p value, giving the result of testing whether D is significantly different from zero}
+\item{Parameters}{A list of the Observed, MeanRandom and MeanBrownian sums of sister-clade differences}
+\item{Permutations}{A list with elements random and brownian, containing the sums of sister-clade differences from random permutations and simulations of Brownian evolution under a threshold model}
+\item{NodalVals}{A list with elements observed, random and brownian, containing the nodal values estimated for the observed trait (as a numeric with names that correspond to node numbers in the phylo object) and those estimated in the permutations (as dataframes with a column for each node, named e.g. X17 for node 17)}
 \item{binvar}{The binary variable used}
 \item{phyName}{The name of the phylogeny object used}
 \item{dsName}{The name of the dataframe used}

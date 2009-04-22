@@ -44,13 +44,13 @@ fusco.randomise(object,  rand.reps=1000, rand.CI = 0.95)
   \item{right}{Use right or left open intervals in plotting the distribution and calculating the correction}
   \item{I.prime}{Plot distribution of I' or I.}
   \item{sim.reps}{Number of replicate Markov trees to simulate}
-  \item{sim.CI} {Confidence intervals to calculate on simulated trees}
+  \item{sim.CI}{Confidence intervals to calculate on simulated trees}
   \item{rand.reps}{Number of randomizations}
-  \item{rand.CI} {Confidence intervals to use on randomizations}
+  \item{rand.CI}{Confidence intervals to use on randomizations}
   \item{nTips}{Number of tips in simulated tree}
   \item{nSpecies}{Number of species on simulated tree}
   \item{plot}{If changed to FALSE, then the plot method does not plot the frequency histogram. Because the method invisibly returns a table of histogram bins along with the observed and corrected frequencies, this isn't as dim an option as it sounds.}
-  \item{...} {Further arguments to generic methods}
+  \item{...}{Further arguments to generic methods}
 }
 \details{
 I is calculated only at bifurcating nodes giving rise to more than 3 tips (or more than 3 species at the tips): nodes with three or fewer descendants have no variation in I and are not informative in assessing imbalance. The expected distribution of the nodal imbalance values between 0 and 1 is theoretically uniform under a Markov null model. However, the range of possible I values at a node is constrained by the number of descendent species. For example, for a node with 8 species, only the values 0, 0.33, 0.66, 1 are possible, corresponding to 4:4, 5:3, 6:2 and 7:1 splits (Fusco and Cronk, 1995). As node size increases, this departure from a uniform distribution decreases. The plot method incorporates a correction, described by Fusco and Cronk (1995), that uses the distribution of all possible splits at each node to characterize and correct for the departure from uniformity.
