@@ -64,9 +64,9 @@ plot(shorebird.tree, show.tip.label=FALSE)
 tiplabels(tip=tipOrd, pch=21, bg=ifelse(shorebird.data$clustered==0, 'white','black'))
 
 # an example where D is not significantly different from a brownian threshold model of evolution (0)
-ex1 <- phylo.d(shorebird.data, shorebird.tree, threat, Species)
+ex1 <- phylo.d(shorebird.data, shorebird.tree, threat, Species, permut=100)
 # an example where D is not significantly different from random (1)
-ex2 <- phylo.d(shorebird.data, shorebird.tree, clustered, Species)
+ex2 <- phylo.d(shorebird.data, shorebird.tree, clustered, Species, permut=100)
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the
