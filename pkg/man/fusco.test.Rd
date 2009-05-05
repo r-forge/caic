@@ -35,8 +35,8 @@ fusco.randomise(object,  rand.reps=1000, rand.CI = 0.95)
   \item{markov.simulate}{Use simulated Markov trees to generate confidence intervals on median I and quartile deviation.}
   \item{reps}{Number of replicates to use in simulation or randomization.}
   \item{conf.int}{Width of confidence intervals required.}
-  \nTips{The number of tips in the tree to be simulated.}
-  \nSpecies{The number of species distributed across those tips.}
+  \item{nTips}{The number of tips in the tree to be simulated.}
+  \item{nSpecies}{The number of species distributed across those tips.}
   \item{object}{An object of class 'fusco'.}
   \item{x}{A object of class 'fusco'.}
   \item{correction}{Apply the correction described in Appendix A of Fusco and Cronk (1995) to the histogram of nodal imbalance.}

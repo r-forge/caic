@@ -54,9 +54,9 @@ Lambda is a proportional rescaling of the shared path lengths of the tips. Where
 }
 \value{
 Both \code{lik.lambda} and \code{lik.kappa} return a list:
- \item{ll} Calculated log likelihood for the supplied lambda or kappa.
- \item{mu} Estimated phylogenitically weighted mean.
- \item{s2} Estimated variance of the mean.
+ \item{ll}Calculated log likelihood for the supplied lambda or kappa.
+ \item{mu}Estimated phylogenitically weighted mean.
+ \item{s2}Estimated variance of the mean.
 The \code{profile} functions invisibly return a data frame of the \code{at} values and their associated log likelihoods. 
 The \code{maxLik} functions return \code{optimize} output: namely, a list with components maximum and objective which give the location of the maximum likelihood and the value of the lambda or kappa at that point.
 

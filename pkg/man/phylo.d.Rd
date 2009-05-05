@@ -24,6 +24,7 @@ phylo.d(ds, phy, binvar, tipnames, permut = 1000, verbose = TRUE)
   \item{verbose}{If TRUE, the function reports progress and other output likely to be important to users}
   \item{x}{An object of class 'phylo.d'}
   \item{object}{An object of class 'phylo.d'}
+  \item{\ldots}{Further arguments to print and summary methods}
 }
 
 \details{
@@ -43,7 +44,6 @@ Returns an object of class 'phylo.d', which is a list of the following:
 \item{phyName}{The name of the phylogeny object used}
 \item{dsName}{The name of the dataframe used}
 \item{nPermut}{The number of permutations used}
-}
 }
 \references{ S. A. Fritz & A. Purvis (2009) In prep. }
 \author{Susanne Fritz (SFritz@bio.ku.dk)}
