@@ -134,6 +134,8 @@ phylo.d <- function(ds, phy, binvar, tipnames, permut=1000, verbose=TRUE) {
 	dvals$phyName <- phyName
 	dvals$dsName <- dsName
 	dvals$nPermut <- permut
+	
+	class(dvals) <- 'phylo.d'
 	return(dvals)
 	
 }

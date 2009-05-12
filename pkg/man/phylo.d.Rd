@@ -58,14 +58,14 @@ shorebird.data$clustered <- rep(c(1,0,1,0,1,0,1,0,1,0,1,0), times=c(4,13,2,12,1,
 # plot the data
 par(mfrow=c(1,2))
 tipOrd <- match(shorebird.data$Species, shorebird.tree$tip.label)
-plot(shorebird.tree, show.tip.label=FALSE) 
+plot(shorebird.tree, show.tip.label=FALSE, main='Random') 
 tiplabels(tip=tipOrd, pch=21, bg=ifelse(shorebird.data$threat==0, 'white','black'))
-plot(shorebird.tree, show.tip.label=FALSE) 
+plot(shorebird.tree, show.tip.label=FALSE, main='Clustered') 
 tiplabels(tip=tipOrd, pch=21, bg=ifelse(shorebird.data$clustered==0, 'white','black'))
 
-# an example where D is not significantly different from a brownian threshold model of evolution (0)
+# an example where D is significantly different from a brownian threshold model of evolution (0)
 ex1 <- phylo.d(shorebird.data, shorebird.tree, threat, Species, permut=100)
-# an example where D is not significantly different from random (1)
+# an example where D is significantly different from random (1)
 ex2 <- phylo.d(shorebird.data, shorebird.tree, clustered, Species, permut=100)
 }
 
